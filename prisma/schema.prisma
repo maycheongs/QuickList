@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int  @id @default(autoincrement())
+  name  String
+  email String @unique
+  lists List[] @relation("UserLists")
+  assignedItems Item[] @relation("AssignedItems")
+}
+
+model List {
+  id          Int       @id @default(autoincrement())
+  name        String
+  type        ListType  // TaskList or PackingList
+  items       Item[]
+  categories  Category[] // categories scoped to this list    
+  users   User[]    @relation("UserLists")        // optional co-authors
+  createdAt   DateTime  @default(now())
+  dueDate     DateTime?  // optional target date for reminders
+  remindersOn Boolean   @default(true)               // allow turning off notifications
+}
+
+model Item {
+  id           Int       @id @default(autoincrement())
+  name         String
+  lastMinute   Boolean   @default(false)
+  checked      Boolean   @default(false)
+  list         List     @relation(fields: [listId], references: [id])
+  listId       Int
+  category     Category? @relation(fields: [categoryId], references: [id])
+  categoryId   Int?
+
+  assignedTo   User?     @relation("AssignedItems", fields: [assignedToId], references: [id])
+  assignedToId Int?
+
+  isTask       Boolean   @default(false)
+  reminderAt   DateTime?
+  recurrence   String?
+  recurrenceEnd DateTime?
+}
+
+model Category {
+  id      Int    @id @default(autoincrement())
+  name    String
+  color   String
+  list    List   @relation(fields: [listId], references: [id])
+  listId  Int
+  items   Item[]
+}
+
+enum ListType {
+  TASK
+  PACKING
+}

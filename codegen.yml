@@ -1,0 +1,10 @@
+schema: ./src/app/api/graphql/typeDefs.ts
+documents: ./src/graphql/**/*.ts
+generates:
+  ./src/graphql/generated/graphql.tsx:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      withHooks: true
