@@ -11,14 +11,14 @@ type Query {
   }
 
 type Mutation {
-createUser(name: String!, email: String!): User!
-createList(name: String!, type: ListType!, userId: Int!): List!
-addItemToList(listId: Int!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
-updateItem(ItemId: Int!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String ): Item!
-addUser(listId: Int!, userId: Int!): List!
-duplicateList(listId: Int!): List!
-toggleReminders(listId: Int!, remindersOn: Boolean): List!
-createCategory(listId: Int!, name: String!): Category!
+    createUser(name: String!, email: String!): User!
+    createList(name: String!, type: ListType!, userId: Int!): List!
+    addItemToList(listId: Int!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
+    updateItem(ItemId: Int!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String ): Item!
+    addUser(listId: Int!, userId: Int!): List!
+    duplicateList(listId: Int!): List!
+    toggleReminders(listId: Int!, remindersOn: Boolean): List!
+    createCategory(listId: Int!, name: String!): Category!
 }
 
 type User {

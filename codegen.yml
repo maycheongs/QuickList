@@ -1,10 +1,12 @@
 schema: ./src/app/api/graphql/typeDefs.ts
-documents: ./src/graphql/**/*.ts
+documents: ./src/graphql/operations/**/*.ts
 generates:
-  ./src/graphql/generated/graphql.tsx:
+  ./src/graphql/codegen.tsx:
     plugins:
       - typescript
       - typescript-operations
       - typescript-react-apollo
     config:
-      withHooks: true
+      withHOC: false         # don't generate HOCs
+      withComponent: false   # don't generate <Component> wrappers
+      addDocBlocks: false    # don't generate big JSDoc comments
