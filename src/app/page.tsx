@@ -1,16 +1,16 @@
-import { Box, Heading, VStack } from "@chakra-ui/react";
-import { ApolloWrapper } from "../components/ApolloWrapper";
-import UserList from "../components/UserList";
+'use client';
 
-export default function Home() {
+import { ApolloWrapper } from '@/components/ApolloWrapper';
+import { ListProvider } from '@/components/ListContext';
+import HomeContent from '@/components/Home';
+
+export default function HomePage() {
+
   return (
     <ApolloWrapper>
-      <Box p={4}>
-        <Heading mb={4}>Users</Heading>
-        <VStack gap={4}>
-          <UserList />
-        </VStack>
-      </Box>
+      <ListProvider>
+        <HomeContent />
+      </ListProvider>
     </ApolloWrapper>
   );
 }
