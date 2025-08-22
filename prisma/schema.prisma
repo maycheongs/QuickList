@@ -55,7 +55,6 @@ model Item {
 model Category {
   id      Int    @id @default(autoincrement())
   name    String
-  color   String
   list    List   @relation(fields: [listId], references: [id])
   listId  Int
   items   Item[]
