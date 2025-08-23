@@ -1,3 +1,4 @@
+//src/components/SidePanel.tsx
 'use client';
 
 import { VStack, Heading, Box } from '@chakra-ui/react';
