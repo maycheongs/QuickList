@@ -28,7 +28,10 @@ async function main() {
 
     //Grocery list with 2 categories, one item is checked, one item is lastMinute, one item has no category
     const groceryList = await prisma.list.create({
-        data: { name: "Grocery List", type: "TASK", users: { connect: { id: alice.id } } },
+        data: {
+            name: "Grocery List", type: "PACKING", dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+            , users: { connect: [{ id: alice.id }, { id: bob.id }] }
+        },
     });
     const dairyCategory = await prisma.category.create({
         data: { name: "Dairy", listId: groceryList.id },
@@ -42,11 +45,16 @@ async function main() {
             { name: "Milk", listId: groceryList.id, categoryId: dairyCategory.id },
             { name: "Cheese", listId: groceryList.id, categoryId: dairyCategory.id, checked: true },
             { name: "Apples", listId: groceryList.id, categoryId: fruitsCategory.id },
+            { name: "Berries", listId: groceryList.id, categoryId: fruitsCategory.id },
+            { name: "Peaches", listId: groceryList.id, categoryId: fruitsCategory.id },
             { name: "Bananas (last minute)", listId: groceryList.id, lastMinute: true },
             { name: "Bread", listId: groceryList.id }, // no category
         ],
     });
+
+
 }
+
 
 main()
     .catch(console.error)

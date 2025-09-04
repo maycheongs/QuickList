@@ -31,7 +31,7 @@ export const resolvers = {
         list: async (_: any, args: { id: number }) => {
             return prisma.list.findUnique({
                 where: { id: args.id },
-                include: { items: true, categories: true, users: true },
+                include: { items: { include: { category: true, assignedTo: true } }, categories: true, users: true },
             });
         },
 
