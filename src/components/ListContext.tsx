@@ -29,7 +29,8 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         // Read from localStorage on client
         const saved = localStorage.getItem('selectedListId');
-        if (saved) setSelectedListId(Number(saved));
+        const listIds = data?.user?.lists?.map(list => list.id) || [];
+        if (saved && Number(saved) in listIds) setSelectedListId(Number(saved));
         else if (data?.user?.lists?.length) {
             // Default to first list if nothing in localStorage
             setSelectedListId(data.user.lists[0].id);
