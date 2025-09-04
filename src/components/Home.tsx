@@ -20,7 +20,7 @@ function HomeContent() {
             <Box w="300px" borderRight="1px solid lightgray">
                 <SidePanel />
             </Box>
-            <Box flex={1} p={4}>
+            <Box flex={1} py={4}>
                 <MainPanel />
             </Box>
         </HStack>

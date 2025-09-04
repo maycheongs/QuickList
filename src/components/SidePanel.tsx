@@ -11,7 +11,7 @@ export default function SidePanel() {
     if (error) return <div>Error: {error.message}</div>;
 
     return (
-        <VStack gap={2} align="stretch" p={4}>
+        <VStack as="nav" gap={2} align="stretch" p={4}>
             <Heading size="md">My Lists</Heading>
             {lists.length === 0 && <Box>No lists. Create one!</Box>}
             {lists.map((list) => (
