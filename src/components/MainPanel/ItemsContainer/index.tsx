@@ -104,6 +104,7 @@ const ItemsContainer = ({ items, categories }: ItemsContainerProps) => {
                     />
                 ) : ''}
             </VStack>
+            <AddItemBar onAddItem={() => { }} />
         </Box>
     )
 }

@@ -64,7 +64,7 @@ const ListHeader = ({ list }: ListHeaderProps) => {
     console.log('duedate', list.dueDate);
 
     return (
-        <Box py={3} px={6} borderBottom="1px solid" borderColor="gray.200">
+        <Box py={3} px={6} borderBottom="1px solid" borderColor="gray.200" position="sticky" top={0} bg="background" zIndex='docked' opacity='0.98'>
             <VStack gap={4} align="start">
                 <Heading size="xl" fontWeight='bold'>{list.name}</Heading>
                 <DatePicker

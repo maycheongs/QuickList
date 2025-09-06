@@ -4,10 +4,23 @@
 
 import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react"
 
+const BG_DEFAULT = "gray.50"
+const BG_DARK = "gray.800"
+
 const customConfig = defineConfig({
+    theme: {
+        semanticTokens: {
+            colors: {
+                background: {
+                    DEFAULT: { value: `colors.${BG_DEFAULT}` },
+                    dark: { value: `colors.${BG_DARK}` }
+                }
+            }
+        }
+    },
     globalCss: {
         "body": {
-            background: "gray.50",
+            background: BG_DEFAULT,
         },
 
     },
