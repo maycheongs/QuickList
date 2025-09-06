@@ -3,6 +3,7 @@
 import { GetListQuery } from '@/graphql/codegen';
 import { Box, VStack } from '@chakra-ui/react';
 import CategorySection from './CategorySection';
+import AddItemBar from '../AddItemBar';
 
 export type Item = NonNullable<GetListQuery['list']>['items'][0] & { color?: string; };
 
@@ -64,7 +65,7 @@ const ItemsContainer = ({ items, categories }: ItemsContainerProps) => {
         return { categorized, uncategorized, lastMinute, checked };
     };
     return (
-        <Box as="section" flex={1} overflowY="auto" py={2} px={5} bg='gray.200'>
+        <Box as="section" flex={1} overflowY="auto" py={2} px={5} bg='gray.200' height='100%'>
             <VStack gap={0} align="stretch">
                 {/* Uncategorized */}
                 {uncategorized.length ?

@@ -2,7 +2,7 @@
 'use client';
 
 import { VStack, Heading, Box } from '@chakra-ui/react';
-import { useListContext } from './ListContext';
+import { useListContext } from '../contexts/ListContext';
 
 
 export default function SidePanel() {

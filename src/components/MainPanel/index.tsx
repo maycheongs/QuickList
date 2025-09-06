@@ -3,7 +3,7 @@
 'use client';
 
 import { Box, Heading, VStack, Checkbox, Spinner, Center, Button } from '@chakra-ui/react';
-import { useListContext } from '../ListContext';
+import { useListContext } from '../../contexts/ListContext';
 import { useGetListQuery } from '@/graphql/codegen';
 import ItemsContainer from './ItemsContainer';
 import ListHeader from './ListHeader';

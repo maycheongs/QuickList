@@ -2,13 +2,13 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useListsByUserQuery, ListsByUserQuery } from '@/graphql/codegen';
+import { useListsByUserQuery, ListsByUserQuery, List, User } from '@/graphql/codegen';
 
 
 type ListContextType = {
     lists: NonNullable<ListsByUserQuery['user']>['lists'];
-    selectedListId: number | null;
-    setSelectedListId: (id: number) => void;
+    selectedListId: List['id'] | null;
+    setSelectedListId: (id: List['id']) => void;
     loading: boolean;
     error: Error | undefined;
     user: ListsByUserQuery['user'];
@@ -17,10 +17,10 @@ type ListContextType = {
 const ListContext = createContext<ListContextType | undefined>(undefined);
 
 export function ListProvider({ children }: { children: React.ReactNode }) {
-    const { data, loading, error } = useListsByUserQuery({ variables: { userId: 1 } }); // Replace with actual user ID or context
-    const [selectedListId, setSelectedListId] = useState<number | null>(null);
+    const { data, loading, error } = useListsByUserQuery({ variables: { userId: '1' } }); // Replace with actual user ID or context
+    const [selectedListId, setSelectedListId] = useState<List['id'] | null>(null);
 
-    const changeSelectedListId = (id: number) => {
+    const changeSelectedListId = (id: List['id']) => {
         localStorage.setItem('selectedListId', id.toString());
         setSelectedListId(id);
     };
@@ -30,7 +30,7 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
         // Read from localStorage on client
         const saved = localStorage.getItem('selectedListId');
         const listIds = data?.user?.lists?.map(list => list.id) || [];
-        if (saved && Number(saved) in listIds) setSelectedListId(Number(saved));
+        if (saved && saved in listIds) setSelectedListId(saved);
         else if (data?.user?.lists?.length) {
             // Default to first list if nothing in localStorage
             setSelectedListId(data.user.lists[0].id);

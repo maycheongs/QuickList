@@ -1,5 +1,5 @@
 //src/components/Home.tsx
-import { useListContext } from './ListContext';
+import { useListContext } from '../contexts/ListContext';
 import { Spinner, Center, Box, HStack } from '@chakra-ui/react';
 import SidePanel from './SidePanel';
 import MainPanel from './MainPanel';
