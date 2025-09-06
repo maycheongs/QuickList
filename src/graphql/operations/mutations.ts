@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 
 // Create a new list
 export const CREATE_LIST = gql`
-  mutation CreateList($name: String!, $type: ListType!, $userId: Int!) {
+  mutation CreateList($name: String!, $type: ListType!, $userId: ID!) {
     createList(name: $name, type: $type, userId: $userId) {
       id
       name
@@ -15,7 +15,7 @@ export const CREATE_LIST = gql`
 // Add item to a list
 export const ADD_ITEM_TO_LIST = gql`
   mutation AddItemToList(
-    $listId: Int!
+    $listId: ID!
     $name: String!
     $lastMinute: Boolean
     $isTask: Boolean
@@ -42,7 +42,7 @@ export const ADD_ITEM_TO_LIST = gql`
 
 // Toggle reminders for a list
 export const TOGGLE_REMINDERS = gql`
-  mutation ToggleReminders($listId: Int!, $remindersOn: Boolean!) {
+  mutation ToggleReminders($listId: ID!, $remindersOn: Boolean!) {
     toggleReminders(listId: $listId, remindersOn: $remindersOn) {
       id
       name
@@ -53,7 +53,7 @@ export const TOGGLE_REMINDERS = gql`
 
 // Duplicate a list
 export const DUPLICATE_LIST = gql`
-  mutation DuplicateList($listId: Int!) {
+  mutation DuplicateList($listId: ID!) {
     duplicateList(listId: $listId) {
       id
       name
@@ -65,10 +65,20 @@ export const DUPLICATE_LIST = gql`
   }
 `;
 
-// Optional: create category
+// Create category
 export const CREATE_CATEGORY = gql`
-  mutation CreateCategory($listId: Int!, $name: String!) {
+  mutation CreateCategory($listId: ID!, $name: String!) {
     createCategory(listId: $listId, name: $name,) {
+      id
+      name
+    }
+  }
+`;
+
+// Update category name
+export const UPDATE_CATEGORY = gql`
+  mutation UpdateCategory($categoryId: ID!, $name: String!) {
+    updateCategory(categoryId: $categoryId, name: $name) {
       id
       name
     }
@@ -79,7 +89,7 @@ export const CREATE_CATEGORY = gql`
 // Update item in a list
 export const UPDATE_ITEM_MUTATION = gql`
   mutation UpdateItem(
-    $itemId: Int!
+    $itemId: ID!
     $name: String
     $checked: Boolean
     $lastMinute: Boolean
@@ -106,6 +116,25 @@ export const UPDATE_ITEM_MUTATION = gql`
         name
       }
       assignedTo {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const DELETE_ITEM_MUTATION = gql`
+  mutation DeleteItem($id: ID!) {
+    deleteItem(itemId: $id) {
+      item {
+        id
+        name
+        category { 
+         id 
+         name 
+        }
+      }
+      deletedCategory {
         id
         name
       }

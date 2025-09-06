@@ -4,6 +4,7 @@ import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { getPrismaClient } from "@/lib/prisma";
 import { typeDefs } from "./typeDefs";
 import { NextRequest } from "next/server";
+import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdateItemArgs, MutationDeleteItemArgs, MutationUpdateCategoryArgs } from "@/graphql/codegen";
 
 const prisma = getPrismaClient();
 
@@ -15,7 +16,7 @@ export const resolvers = {
             });
         },
 
-        user: async (_: any, args: { id: number }) => {
+        user: async (_: any, args: QueryUserArgs) => {
             return prisma.user.findUnique({
                 where: { id: args.id },
                 include: { lists: true, assignedItems: true },
@@ -28,21 +29,21 @@ export const resolvers = {
             });
         },
 
-        list: async (_: any, args: { id: number }) => {
+        list: async (_: any, args: { id: QueryListArgs }) => {
             return prisma.list.findUnique({
                 where: { id: args.id },
                 include: { items: { include: { category: true, assignedTo: true } }, categories: true, users: true },
             });
         },
 
-        items: async (_: any, args: { listId: number }) => {
+        items: async (_: any, args: { listId: QueryListArgs['id'] }) => {
             return prisma.item.findMany({
                 where: { listId: args.listId },
                 include: { category: true, assignedTo: true, list: true },
             });
         },
 
-        categories: async (_: any, args: { listId: number }) => {
+        categories: async (_: any, args: { listId: QueryListArgs['id'] }) => {
             return prisma.category.findMany({
                 where: { listId: args.listId },
                 include: { items: true, list: true },
@@ -69,14 +70,7 @@ export const resolvers = {
 
         addItemToList: async (
             _: any,
-            args: {
-                listId: number;
-                name: string;
-                lastMinute?: boolean;
-                isTask?: boolean;
-                categoryId?: number;
-                assignedToId?: number;
-            }
+            args: MutationAddItemToListArgs
         ) => {
             return prisma.item.create({
                 data: {
@@ -92,15 +86,7 @@ export const resolvers = {
 
         updateItem: async (
             _: any,
-            args: {
-                ItemId: number;
-                checked?: boolean;
-                name?: string;
-                lastMinute?: boolean;
-                isTask?: boolean;
-                categoryId?: number;
-                assignedToId?: number;
-            }
+            args: MutationUpdateItemArgs
         ) => {
             return prisma.item.update({
                 where: { id: args.ItemId },
@@ -115,7 +101,39 @@ export const resolvers = {
             });
         },
 
-        addUser: async (_: any, args: { listId: number; userId: number }) => {
+
+        deleteItem: async (_: any, args: MutationDeleteItemArgs) => {
+            // Fetch the item first, including its category
+            const item = await prisma.item.findUnique({
+                where: { id: args.itemId },
+                include: { category: true },
+            });
+
+            if (!item) throw new Error("Item not found");
+
+            const categoryId = item.category?.id;
+
+            // Delete the item
+            await prisma.item.delete({ where: { id: args.itemId } });
+
+
+            // If the item had a category, check if category is now empty
+            let deletedCategory = null;
+            if (item.category?.id) {
+                const remainingItems = await prisma.item.count({
+                    where: { categoryId },
+                });
+
+                if (remainingItems === 0) {
+                    // Delete the empty category
+                    deletedCategory = await prisma.category.delete({ where: { id: categoryId } });
+                }
+            }
+
+            return { ...item, deletedCategory };
+        },
+
+        addUser: async (_: any, args: { listId: QueryListArgs['id']; userId: QueryUserArgs['id'] }) => {
             return prisma.list.update({
                 where: { id: args.listId },
                 data: { users: { connect: { id: args.userId } } },
@@ -123,7 +141,7 @@ export const resolvers = {
             });
         },
 
-        duplicateList: async (_: any, args: { listId: number, userId: number }) => {
+        duplicateList: async (_: any, args: { listId: QueryListArgs['id'], userId: QueryUserArgs['id'] }) => {
             const original = await prisma.list.findUnique({
                 where: { id: args.listId },
                 include: { categories: true, items: true },
@@ -163,6 +181,23 @@ export const resolvers = {
                 data: { name: args.name, list: { connect: { id: args.listId } } },
             });
         },
+
+        updateCategory: async (_: any, args: MutationUpdateCategoryArgs) => {
+            return prisma.category.update({
+                where: { id: args.categoryId },
+                data: { name: args.name },
+            });
+        },
+
+        deleteList: async (_: any, args: { listId: QueryListArgs['id'] }) => {
+            // Cascade delete items and categories
+            await prisma.item.deleteMany({ where: { listId: args.listId } });
+            await prisma.category.deleteMany({ where: { listId: args.listId } });
+
+            return prisma.list.delete({ where: { id: args.listId } });
+        },
+
+
     },
 };
 

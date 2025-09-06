@@ -1,28 +1,38 @@
 import { gql } from 'graphql-tag'
 
 export const typeDefs = gql`
+scalar ID
+
 type Query {
     users: [User!]!
-    user(id: Int!): User
+    user(id: ID!): User
     lists: [List!]!
-    list(id: Int!): List
-    items(listId: Int!): [Item!]!
-    categories(listId: Int!): [Category!]!
+    list(id: ID!): List
+    items(listId: ID!): [Item!]!
+    categories(listId: ID!): [Category!]!
   }
+
+type DeleteItemResult {
+  item: Item!
+  deletedCategory: Category
+}
 
 type Mutation {
     createUser(name: String!, email: String!): User!
-    createList(name: String!, type: ListType!, userId: Int!): List!
-    addItemToList(listId: Int!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
-    updateItem(ItemId: Int!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String ): Item!
-    addUser(listId: Int!, userId: Int!): List!
-    duplicateList(listId: Int!): List!
-    toggleReminders(listId: Int!, remindersOn: Boolean): List!
-    createCategory(listId: Int!, name: String!): Category!
+    createList(name: String!, type: ListType!, userId: ID!): List!
+    deleteList(listId:ID!): List!
+    addItemToList(listId: ID!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
+    updateItem(ItemId: ID!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String ): Item!
+    deleteItem(itemId: ID!): DeleteItemResult!
+    addUser(listId: ID!, userId: ID!): List!
+    duplicateList(listId: ID!): List!
+    toggleReminders(listId: ID!, remindersOn: Boolean): List!
+    createCategory(listId: ID!, name: String!): Category!
+    updateCategory(categoryId: ID!, name: String!): Category!
 }
 
 type User {
-    id: Int!
+    id: ID!
     name: String!
     email: String!
     lists: [List!]!
@@ -30,7 +40,7 @@ type User {
   }
 
 type List {
-    id: Int!
+    id: ID!
     name: String!
     type: ListType!
     items: [Item!]!
@@ -42,7 +52,7 @@ type List {
   }
 
  type Item {
-    id: Int!
+    id: ID!
     name: String!
     lastMinute: Boolean!
     checked: Boolean!
@@ -56,7 +66,7 @@ type List {
   } 
 
  type Category {
-    id: Int!
+    id: ID!
     name: String!
     list: List!
     items: [Item!]!

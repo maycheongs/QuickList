@@ -6,6 +6,8 @@ import CategorySection from './CategorySection';
 import AddItemBar from '../AddItemBar';
 
 export type Item = NonNullable<GetListQuery['list']>['items'][0] & { color?: string; };
+export type Category = NonNullable<GetListQuery['list']>['categories'][0];
+export type List = NonNullable<GetListQuery['list']>;
 
 interface OrganizedItems {
     categorized: Record<string, Item[]>;
@@ -16,7 +18,7 @@ interface OrganizedItems {
 
 interface ItemsContainerProps {
     items: Item[],
-    categories?: NonNullable<GetListQuery['list']>['categories']
+    categories?: Category[]
 };
 
 
@@ -26,7 +28,7 @@ const categoryColors = ['blue', 'green', 'purple', 'red', 'orange', 'pink', 'yel
 const ItemsContainer = ({ items, categories }: ItemsContainerProps) => {
 
 
-    const categoryColorMap: Record<number, string> = {};
+    const categoryColorMap: Record<Category['id'], string> = {};
     (categories || []).forEach((cat, idx) => {
         categoryColorMap[cat.id] = categoryColors[idx % categoryColors.length];
     });

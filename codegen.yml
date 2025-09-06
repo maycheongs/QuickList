@@ -7,6 +7,8 @@ generates:
       - typescript-operations
       - typescript-react-apollo
     config:
+      scalars:
+        ID: string
       withHOC: false         # don't generate HOCs
       withComponent: false   # don't generate <Component> wrappers
       addDocBlocks: false    # don't generate big JSDoc comments

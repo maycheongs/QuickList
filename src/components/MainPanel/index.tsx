@@ -7,6 +7,7 @@ import { useListContext } from '../../contexts/ListContext';
 import { useGetListQuery } from '@/graphql/codegen';
 import ItemsContainer from './ItemsContainer';
 import ListHeader from './ListHeader';
+import { ListDataProvider } from '../../contexts/list-data/ListDataContext';
 
 
 export default function MainPanel() {
@@ -48,9 +49,11 @@ export default function MainPanel() {
 
 
     return (
-        <Box as="main" fontSize={14}>
-            <ListHeader list={list} />
-            <ItemsContainer items={list.items} categories={list.categories || []} />
+        <Box as="main" fontSize={14} height='100%'>
+            <ListDataProvider>
+                <ListHeader list={list} />
+                <ItemsContainer items={list.items} categories={list.categories || []} />
+            </ListDataProvider>
         </Box>
     );
 }

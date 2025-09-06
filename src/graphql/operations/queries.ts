@@ -12,7 +12,7 @@ export const GET_LISTS = gql`
 
 // Get lists by user ID
 export const GET_LISTS_BY_USER = gql`
-  query ListsByUser($userId: Int!) {
+  query ListsByUser($userId: ID!) {
     user(id: $userId) {
       id
       name
@@ -26,7 +26,7 @@ export const GET_LISTS_BY_USER = gql`
 
 // Get a single list by ID (for main panel)
 export const GET_LIST_BY_ID = gql`
-  query GetList($id: Int!) {
+  query GetList($id: ID!) {
     list(id: $id) {
       id
       name
