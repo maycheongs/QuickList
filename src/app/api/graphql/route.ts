@@ -19,7 +19,20 @@ export const resolvers = {
         user: async (_: any, args: QueryUserArgs) => {
             return prisma.user.findUnique({
                 where: { id: args.id },
-                include: { lists: true, assignedItems: true },
+                include: {
+                    lists: {
+                        include:
+                        {
+                            items: {
+                                include:
+                                    { category: true, assignedTo: true }
+                            },
+                            categories: true,
+                            users: true
+                        }
+                    },
+                    assignedItems: true
+                },
             });
         },
 

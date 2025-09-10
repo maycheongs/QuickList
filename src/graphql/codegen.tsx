@@ -278,7 +278,7 @@ export type ListsByUserQueryVariables = Exact<{
 }>;
 
 
-export type ListsByUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, lists: Array<{ __typename?: 'List', id: string, name: string }> } | null };
+export type ListsByUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, lists: Array<{ __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn: boolean, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, assignedTo?: { __typename?: 'User', id: string, name: string, email: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> }> } | null };
 
 export type GetListQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -495,6 +495,32 @@ export const ListsByUserDocument = gql`
     lists {
       id
       name
+      dueDate
+      remindersOn
+      categories {
+        id
+        name
+      }
+      items {
+        id
+        name
+        checked
+        lastMinute
+        assignedTo {
+          id
+          name
+          email
+        }
+        category {
+          id
+          name
+        }
+      }
+      users {
+        id
+        name
+        email
+      }
     }
   }
 }

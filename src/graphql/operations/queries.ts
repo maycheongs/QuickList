@@ -19,6 +19,32 @@ export const GET_LISTS_BY_USER = gql`
       lists {
         id
         name
+        dueDate
+        remindersOn
+        categories {
+          id
+          name
+        }
+        items {
+          id
+          name
+          checked
+          lastMinute
+          assignedTo {
+            id
+            name
+            email          
+          }
+          category {
+            id
+            name
+          }
+        }
+        users {
+          id
+          name
+          email
+        }
       }
     }
   }
