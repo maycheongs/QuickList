@@ -17,7 +17,7 @@ type ListContextType = {
 const ListContext = createContext<ListContextType | undefined>(undefined);
 
 export function ListProvider({ children }: { children: React.ReactNode }) {
-    const { data, loading, error } = useListsByUserQuery({ variables: { userId: '1' } }); // Replace with actual user ID or context
+    const { data, loading, error } = useListsByUserQuery({ variables: { userId: "test-id" } }); // Replace with actual user ID or context
     const [selectedListId, setSelectedListId] = useState<List['id'] | null>(null);
 
     const changeSelectedListId = (id: List['id']) => {

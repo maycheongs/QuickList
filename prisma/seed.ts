@@ -4,8 +4,10 @@ const prisma = new PrismaClient();
 async function main() {
 
     //USER SEEDS
-    const alice = await prisma.user.create({
-        data: { name: "Alice", email: "alice@example.com" },
+    const alice = await prisma.user.upsert({
+        where: { id: "test-id" },
+        update: {},
+        create: { name: "Alice", email: "alice@example.com", id: "test-id" },
     });
 
     const bob = await prisma.user.create({

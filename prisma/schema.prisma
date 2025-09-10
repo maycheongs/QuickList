@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id    Int  @id @default(autoincrement())
+  id    String  @id @default(cuid())
   name  String
   email String @unique
   lists List[] @relation("UserLists")
@@ -22,7 +22,7 @@ model User {
 }
 
 model List {
-  id          Int       @id @default(autoincrement())
+  id          String       @id @default(cuid())
   name        String
   type        ListType  // TaskList or PackingList
   items       Item[]
@@ -34,17 +34,17 @@ model List {
 }
 
 model Item {
-  id           Int       @id @default(autoincrement())
+  id           String       @id @default(cuid())
   name         String
   lastMinute   Boolean   @default(false)
   checked      Boolean   @default(false)
   list         List     @relation(fields: [listId], references: [id])
-  listId       Int
+  listId       String
   category     Category? @relation(fields: [categoryId], references: [id])
-  categoryId   Int?
+  categoryId   String?
 
   assignedTo   User?     @relation("AssignedItems", fields: [assignedToId], references: [id])
-  assignedToId Int?
+  assignedToId String?
 
   isTask       Boolean   @default(false)
   reminderAt   DateTime?
@@ -53,10 +53,10 @@ model Item {
 }
 
 model Category {
-  id      Int    @id @default(autoincrement())
+  id      String    @id @default(cuid())
   name    String
   list    List   @relation(fields: [listId], references: [id])
-  listId  Int
+  listId  String
   items   Item[]
 }
 
