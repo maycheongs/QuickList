@@ -21,22 +21,24 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
     const [selectedListId, setSelectedListId] = useState<List['id'] | null>(null);
 
     const changeSelectedListId = (id: List['id']) => {
-        localStorage.setItem('selectedListId', id.toString());
+        localStorage.setItem(`selectedListId: ${data?.user?.id}`, id.toString());
         setSelectedListId(id);
     };
+
+    console.log('fetched data for user', data)
 
     // Set default selected list to first one if there isn't one in localStorage
     useEffect(() => {
         if (!(data?.user?.lists.length)) return // only matters if there are lists
         // Read from localStorage on client
-        const saved = localStorage.getItem('selectedListId');
+        const saved = localStorage.getItem(`selectedListId: ${data.user.id}`);
         const listIds = data.user?.lists?.map(list => list.id) || [];
-        if (saved && saved in listIds) setSelectedListId(saved);
+        if (saved && listIds.includes(saved)) setSelectedListId(saved);
         else {
             // Default to first list if nothing in localStorage or id in localStorage does not exist in lists
             setSelectedListId(data.user.lists[0].id);
         }
-    }, [data]);
+    }, [data?.user?.id]);
 
     return (
         <ListContext.Provider
