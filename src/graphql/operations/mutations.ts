@@ -19,7 +19,7 @@ export const ADD_ITEM_TO_LIST = gql`
     $name: String!
     $lastMinute: Boolean
     $isTask: Boolean
-    $categoryId: Int
+    $categoryId: ID
   ) {
     addItemToList(
       listId: $listId
@@ -94,8 +94,8 @@ export const UPDATE_ITEM_MUTATION = gql`
     $checked: Boolean
     $lastMinute: Boolean
     $isTask: Boolean
-    $categoryId: Int
-    $assignedToId: Int
+    $categoryId: ID
+    $assignedToId: ID
   ) {
     updateItem(
       ItemId: $itemId

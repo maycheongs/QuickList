@@ -50,6 +50,7 @@ model Item {
   reminderAt   DateTime?
   recurrence   String?
   recurrenceEnd DateTime?
+  createdAt    DateTime  @default(now())
 }
 
 model Category {

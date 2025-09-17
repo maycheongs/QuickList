@@ -4,7 +4,8 @@ import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { getPrismaClient } from "@/lib/prisma";
 import { typeDefs } from "./typeDefs";
 import { NextRequest } from "next/server";
-import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdateItemArgs, MutationDeleteItemArgs, MutationUpdateCategoryArgs } from "@/graphql/codegen";
+import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdateItemArgs, MutationDeleteItemArgs, MutationUpdateCategoryArgs, Category } from "@/graphql/codegen";
+
 
 const prisma = getPrismaClient();
 
@@ -21,9 +22,11 @@ export const resolvers = {
                 where: { id: args.id },
                 include: {
                     lists: {
+                        orderBy: { createdAt: 'desc' },
                         include:
                         {
                             items: {
+                                orderBy: { createdAt: 'desc' },
                                 include:
                                     { category: true, assignedTo: true }
                             },
@@ -42,7 +45,7 @@ export const resolvers = {
             });
         },
 
-        list: async (_: any, args: { id: QueryListArgs }) => {
+        list: async (_: any, args: QueryListArgs) => {
             return prisma.list.findUnique({
                 where: { id: args.id },
                 include: { items: { include: { category: true, assignedTo: true } }, categories: true, users: true },
@@ -71,7 +74,7 @@ export const resolvers = {
             });
         },
 
-        createList: async (_: any, args: { name: string; type: 'TASK' | 'PACKING'; userId: number }) => {
+        createList: async (_: any, args: { name: string; type: 'TASK' | 'PACKING'; userId: QueryUserArgs['id'] }) => {
             return prisma.list.create({
                 data: {
                     name: args.name,
@@ -182,14 +185,14 @@ export const resolvers = {
         },
 
 
-        toggleReminders: async (_: any, args: { listId: number; remindersOn: boolean }) => {
+        toggleReminders: async (_: any, args: { listId: QueryListArgs['id']; remindersOn: boolean }) => {
             return prisma.list.update({
                 where: { id: args.listId },
                 data: { remindersOn: args.remindersOn },
             });
         },
 
-        createCategory: async (_: any, args: { listId: number; name: string }) => {
+        createCategory: async (_: any, args: { listId: QueryListArgs['id']; name: string }) => {
             return prisma.category.create({
                 data: { name: args.name, list: { connect: { id: args.listId } } },
             });

@@ -21,6 +21,7 @@ export const GET_LISTS_BY_USER = gql`
         name
         dueDate
         remindersOn
+        createdAt
         categories {
           id
           name
@@ -30,6 +31,7 @@ export const GET_LISTS_BY_USER = gql`
           name
           checked
           lastMinute
+          createdAt
           assignedTo {
             id
             name
@@ -67,6 +69,11 @@ export const GET_LIST_BY_ID = gql`
         name
         checked
         lastMinute
+        assignedTo {
+        id
+        email
+        name
+        }
         category {
           id
           name

@@ -42,13 +42,13 @@ type User {
 type List {
     id: ID!
     name: String!
-    type: ListType!
+    type: ListType
     items: [Item!]!
     categories: [Category!]!
     users: [User!]!
     createdAt: String!
     dueDate: String
-    remindersOn: Boolean!
+    remindersOn: Boolean
   }
 
  type Item {
@@ -59,10 +59,11 @@ type List {
     list: List!
     category: Category
     assignedTo: User
-    isTask: Boolean!
+    isTask: Boolean
     reminderAt: String
     recurrence: String
     recurrenceEnd: String
+    createdAt: String!
   } 
 
  type Category {
