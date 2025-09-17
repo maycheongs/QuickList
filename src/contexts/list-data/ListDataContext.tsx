@@ -1,3 +1,6 @@
+//contexts/list-data/ListDataContext.tsx
+'use client';
+
 import { createContext, useReducer, useContext, ReactNode } from "react";
 import { listDataReducer } from "./listDataReducer";
 import type { ListDataAction, ListDataState } from "./listDataReducer";
@@ -12,7 +15,7 @@ export function ListDataProvider({
     children: ReactNode;
     initialState?: ListDataState;
 }) {
-    const [state, dispatch] = useReducer(listDataReducer, initialState || { items: [], categories: [] });
+    const [state, dispatch] = useReducer(listDataReducer, initialState || { id: '', items: [], categories: [] });
 
     return (
         <ListDataStateContext.Provider value={state}>

@@ -3,7 +3,8 @@
 import { GetListQuery } from '@/graphql/codegen';
 import { Box, VStack } from '@chakra-ui/react';
 import CategorySection from './CategorySection';
-import AddItemBar from '../AddItemBar';
+import AddItemBar from './AddItemBar';
+import { useListDataState } from '@/contexts/list-data/ListDataContext';
 
 export type Item = NonNullable<GetListQuery['list']>['items'][0] & { color?: string; };
 export type Category = NonNullable<GetListQuery['list']>['categories'][0];
@@ -16,16 +17,13 @@ interface OrganizedItems {
     checked: Item[];
 }
 
-interface ItemsContainerProps {
-    items: Item[],
-    categories?: Category[]
-};
-
 
 const categoryColors = ['blue', 'green', 'purple', 'red', 'orange', 'pink', 'yellow', 'teal', 'cyan', 'gray'];
 
 
-const ItemsContainer = ({ items, categories }: ItemsContainerProps) => {
+const ItemsContainer = () => {
+
+    const { items, categories } = useListDataState()
 
 
     const categoryColorMap: Record<Category['id'], string> = {};
@@ -53,7 +51,7 @@ const ItemsContainer = ({ items, categories }: ItemsContainerProps) => {
             } else if (item.lastMinute) {
                 lastMinute.push(item);
             } else if (item.category) {
-                const categoryKey = `${item.category.id}-${item.category.name}`
+                const categoryKey = `${item.category.id}_${item.category.name}`
                 if (!categorized[categoryKey]) {
                     categorized[categoryKey] = [];
                 }
@@ -67,47 +65,49 @@ const ItemsContainer = ({ items, categories }: ItemsContainerProps) => {
         return { categorized, uncategorized, lastMinute, checked };
     };
     return (
-        <Box as="section" flex={1} overflowY="auto" py={2} px={5} bg='gray.200' height='100%'>
-            <VStack gap={0} align="stretch">
-                {/* Uncategorized */}
-                {uncategorized.length ?
-                    <CategorySection
-                        categoryKey={null}
-                        items={uncategorized}
-                        color='gray'
-
-                    /> : ''}
-
-                {/* Categories */}
-                {Object.keys(categorized).length ?
-                    Object.entries(categorized).map(([categoryKey, items], index) => (
+        <Box as="section" flex={1} py={2} px={5} bg='gray.200' position="relative" overflow="hidden">
+            <Box overflowY="auto" height="100%" pb={16}>
+                <VStack gap={0} align="stretch">
+                    {/* Uncategorized */}
+                    {uncategorized.length ?
                         <CategorySection
-                            categoryKey={categoryKey}
-                            items={items}
-                            color={categoryColorMap[Number(categoryKey.split('-')[0])]}
+                            categoryKey={null}
+                            items={uncategorized}
+                            color='gray'
+
+                        /> : ''}
+
+                    {/* Categories */}
+                    {Object.keys(categorized).length ?
+                        Object.entries(categorized).map(([categoryKey, items], index) => (
+                            <CategorySection
+                                categoryKey={categoryKey}
+                                items={items}
+                                color={categoryColorMap[(categoryKey.split('_')[0])]}
+                            />
+                        )) : ''}
+
+
+
+                    {/* Last Minute */}
+                    {lastMinute.length ?
+                        <CategorySection
+                            items={lastMinute}
+                            isLastMinute={true}
+                            color='gray'
+                        /> : ''}
+
+                    {/* Checked Items */}
+                    {checked.length ? (
+                        <CategorySection
+                            items={checked}
+                            isChecked={true}
+                            color='gray'
                         />
-                    )) : ''}
-
-
-
-                {/* Last Minute */}
-                {lastMinute.length ?
-                    <CategorySection
-                        items={lastMinute}
-                        isLastMinute={true}
-                        color='gray'
-                    /> : ''}
-
-                {/* Checked Items */}
-                {checked.length ? (
-                    <CategorySection
-                        items={checked}
-                        isChecked={true}
-                        color='gray'
-                    />
-                ) : ''}
-            </VStack>
-            <AddItemBar onAddItem={() => { }} />
+                    ) : ''}
+                </VStack>
+            </Box>
+            <AddItemBar categories={categories} />
         </Box>
     )
 }

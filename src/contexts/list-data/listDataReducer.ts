@@ -1,15 +1,20 @@
+//contexts/list-data/listDataReducer.ts
+'use client';
 
-import { Item, Category } from "../../components/MainPanel/ItemsContainer";
+
+import CategorySection from "@/components/MainPanel/ItemsContainer/CategorySection";
+import { Item, Category, List } from "../../components/MainPanel/ItemsContainer";
 
 // Full state
 export type ListDataState = {
+    id: List['id'],
     categories: Category[];
     items: Item[];
 };
 
 // Actions
 export type ListDataAction =
-    | { type: "SET_DATA"; items: Item[]; categories: Category[] }
+    | { type: "SET_DATA"; id: List['id'], items: Item[]; categories: Category[] }
     | { type: "ADD_ITEM"; item: Item }
     | { type: "UPDATE_ITEM"; id: Item['id']; changes: Partial<Item> }
     | { type: "DELETE_ITEM"; id: Item['id'] }
@@ -21,10 +26,10 @@ export type ListDataAction =
 export function listDataReducer(state: ListDataState, action: ListDataAction): ListDataState {
     switch (action.type) {
         case "SET_DATA":
-            return { items: action.items, categories: action.categories };
+            return { id: action.id, items: action.items, categories: action.categories };
 
         case "ADD_ITEM":
-            return { ...state, items: [...state.items, action.item] };
+            return { ...state, items: [action.item, ...state.items] };
 
         case "UPDATE_ITEM":
             return {
@@ -46,6 +51,9 @@ export function listDataReducer(state: ListDataState, action: ListDataAction): L
                 categories: state.categories.map(cat =>
                     cat.id === action.id ? { ...cat, ...action.changes } : cat
                 ),
+                items: state.items.map(item =>
+                    item.category?.id === action.id ? { ...item, category: { ...item.category, ...action.changes } } : item
+                )
             };
 
         case "DELETE_CATEGORY":

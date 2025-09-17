@@ -33,7 +33,7 @@ function CategorySection({ categoryKey, items, isChecked, isLastMinute, color }:
                         onToggleCheck={(item) => { console.log('toggle check', item) }}
                         onToggleLastMinute={(item) => { console.log('toggle last minute', item) }}
                         onSetCategory={(cat) => console.log('Set category', cat)}
-                        categories={[{ id: 1, name: 'Cat1' }, { id: 2, name: 'Cat2' }]}
+                        categories={categories}
                         color={color}
                     />
                 ))}

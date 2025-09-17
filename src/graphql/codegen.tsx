@@ -36,8 +36,9 @@ export type Item = {
   assignedTo?: Maybe<User>;
   category?: Maybe<Category>;
   checked: Scalars['Boolean']['output'];
+  createdAt: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  isTask: Scalars['Boolean']['output'];
+  isTask?: Maybe<Scalars['Boolean']['output']>;
   lastMinute: Scalars['Boolean']['output'];
   list: List;
   name: Scalars['String']['output'];
@@ -54,8 +55,8 @@ export type List = {
   id: Scalars['ID']['output'];
   items: Array<Item>;
   name: Scalars['String']['output'];
-  remindersOn: Scalars['Boolean']['output'];
-  type: ListType;
+  remindersOn?: Maybe<Scalars['Boolean']['output']>;
+  type?: Maybe<ListType>;
   users: Array<User>;
 };
 
@@ -76,13 +77,13 @@ export type Mutation = {
   duplicateList: List;
   toggleReminders: List;
   updateCategory: Category;
-  updateItem: Item;
+  updateItem: UpdateItemPayload;
 };
 
 
 export type MutationAddItemToListArgs = {
-  assignedToId?: InputMaybe<Scalars['Int']['input']>;
-  categoryId?: InputMaybe<Scalars['Int']['input']>;
+  assignedToId?: InputMaybe<Scalars['ID']['input']>;
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
   isTask?: InputMaybe<Scalars['Boolean']['input']>;
   lastMinute?: InputMaybe<Scalars['Boolean']['input']>;
   listId: Scalars['ID']['input'];
@@ -147,8 +148,8 @@ export type MutationUpdateCategoryArgs = {
 
 export type MutationUpdateItemArgs = {
   ItemId: Scalars['ID']['input'];
-  assignedToId?: InputMaybe<Scalars['Int']['input']>;
-  categoryId?: InputMaybe<Scalars['Int']['input']>;
+  assignedToId?: InputMaybe<Scalars['ID']['input']>;
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
   checked?: InputMaybe<Scalars['Boolean']['input']>;
   isTask?: InputMaybe<Scalars['Boolean']['input']>;
   lastMinute?: InputMaybe<Scalars['Boolean']['input']>;
@@ -188,6 +189,12 @@ export type QueryUserArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type UpdateItemPayload = {
+  __typename?: 'UpdateItemPayload';
+  deletedCategory?: Maybe<Category>;
+  item: Item;
+};
+
 export type User = {
   __typename?: 'User';
   assignedItems: Array<Item>;
@@ -204,14 +211,14 @@ export type CreateListMutationVariables = Exact<{
 }>;
 
 
-export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type: ListType } };
+export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type?: ListType | null } };
 
 export type AddItemToListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   lastMinute?: InputMaybe<Scalars['Boolean']['input']>;
   isTask?: InputMaybe<Scalars['Boolean']['input']>;
-  categoryId?: InputMaybe<Scalars['Int']['input']>;
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
@@ -223,7 +230,7 @@ export type ToggleRemindersMutationVariables = Exact<{
 }>;
 
 
-export type ToggleRemindersMutation = { __typename?: 'Mutation', toggleReminders: { __typename?: 'List', id: string, name: string, remindersOn: boolean } };
+export type ToggleRemindersMutation = { __typename?: 'Mutation', toggleReminders: { __typename?: 'List', id: string, name: string, remindersOn?: boolean | null } };
 
 export type DuplicateListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
@@ -254,12 +261,12 @@ export type UpdateItemMutationVariables = Exact<{
   checked?: InputMaybe<Scalars['Boolean']['input']>;
   lastMinute?: InputMaybe<Scalars['Boolean']['input']>;
   isTask?: InputMaybe<Scalars['Boolean']['input']>;
-  categoryId?: InputMaybe<Scalars['Int']['input']>;
-  assignedToId?: InputMaybe<Scalars['Int']['input']>;
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
+  assignedToId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type UpdateItemMutation = { __typename?: 'Mutation', updateItem: { __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, isTask: boolean, category?: { __typename?: 'Category', id: string, name: string } | null, assignedTo?: { __typename?: 'User', id: string, name: string } | null } };
+export type UpdateItemMutation = { __typename?: 'Mutation', updateItem: { __typename?: 'UpdateItemPayload', item: { __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, isTask?: boolean | null, category?: { __typename?: 'Category', id: string, name: string } | null, assignedTo?: { __typename?: 'User', id: string, name: string } | null }, deletedCategory?: { __typename?: 'Category', id: string, name: string } | null } };
 
 export type DeleteItemMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -278,14 +285,14 @@ export type ListsByUserQueryVariables = Exact<{
 }>;
 
 
-export type ListsByUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, lists: Array<{ __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn: boolean, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, assignedTo?: { __typename?: 'User', id: string, name: string, email: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> }> } | null };
+export type ListsByUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, lists: Array<{ __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn?: boolean | null, createdAt: string, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, createdAt: string, assignedTo?: { __typename?: 'User', id: string, name: string, email: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> }> } | null };
 
 export type GetListQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetListQuery = { __typename?: 'Query', list?: { __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn: boolean, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } | null };
+export type GetListQuery = { __typename?: 'Query', list?: { __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn?: boolean | null, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, assignedTo?: { __typename?: 'User', id: string, email: string, name: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } | null };
 
 
 export const CreateListDocument = gql`
@@ -306,7 +313,7 @@ export type CreateListMutationHookResult = ReturnType<typeof useCreateListMutati
 export type CreateListMutationResult = Apollo.MutationResult<CreateListMutation>;
 export type CreateListMutationOptions = Apollo.BaseMutationOptions<CreateListMutation, CreateListMutationVariables>;
 export const AddItemToListDocument = gql`
-    mutation AddItemToList($listId: ID!, $name: String!, $lastMinute: Boolean, $isTask: Boolean, $categoryId: Int) {
+    mutation AddItemToList($listId: ID!, $name: String!, $lastMinute: Boolean, $isTask: Boolean, $categoryId: ID) {
   addItemToList(
     listId: $listId
     name: $name
@@ -403,7 +410,7 @@ export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCatego
 export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
 export const UpdateItemDocument = gql`
-    mutation UpdateItem($itemId: ID!, $name: String, $checked: Boolean, $lastMinute: Boolean, $isTask: Boolean, $categoryId: Int, $assignedToId: Int) {
+    mutation UpdateItem($itemId: ID!, $name: String, $checked: Boolean, $lastMinute: Boolean, $isTask: Boolean, $categoryId: ID, $assignedToId: ID) {
   updateItem(
     ItemId: $itemId
     name: $name
@@ -413,16 +420,22 @@ export const UpdateItemDocument = gql`
     categoryId: $categoryId
     assignedToId: $assignedToId
   ) {
-    id
-    name
-    checked
-    lastMinute
-    isTask
-    category {
+    item {
       id
       name
+      checked
+      lastMinute
+      isTask
+      category {
+        id
+        name
+      }
+      assignedTo {
+        id
+        name
+      }
     }
-    assignedTo {
+    deletedCategory {
       id
       name
     }
@@ -497,6 +510,7 @@ export const ListsByUserDocument = gql`
       name
       dueDate
       remindersOn
+      createdAt
       categories {
         id
         name
@@ -506,6 +520,7 @@ export const ListsByUserDocument = gql`
         name
         checked
         lastMinute
+        createdAt
         assignedTo {
           id
           name
@@ -557,6 +572,11 @@ export const GetListDocument = gql`
       name
       checked
       lastMinute
+      assignedTo {
+        id
+        email
+        name
+      }
       category {
         id
         name

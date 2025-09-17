@@ -2,23 +2,52 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useListsByUserQuery, ListsByUserQuery, List, User } from '@/graphql/codegen';
+import { useListsByUserQuery, ListsByUserQuery, User } from '@/graphql/codegen';
+import { ListDataState } from './list-data/listDataReducer';
 
 
 type ListContextType = {
-    lists: NonNullable<ListsByUserQuery['user']>['lists'];
+    lists: { id: List['id'], name: List['name'], dueDate?: List['dueDate'] }[];
     selectedListId: List['id'] | null;
     setSelectedListId: (id: List['id']) => void;
     loading: boolean;
     error: Error | undefined;
     user: ListsByUserQuery['user'];
+    listDataMap: ListDataMap;
+    setListDataForList: (listId: List['id'], state: ListDataState) => void
 };
+
+type List = NonNullable<ListsByUserQuery['user']>['lists'][0]
+type ListDataMap = Record<string, List>
 
 const ListContext = createContext<ListContextType | undefined>(undefined);
 
 export function ListProvider({ children }: { children: React.ReactNode }) {
     const { data, loading, error } = useListsByUserQuery({ variables: { userId: "test-id" } }); // Replace with actual user ID or context
     const [selectedListId, setSelectedListId] = useState<List['id'] | null>(null);
+    const [listDataMap, setListDataMap] = useState<ListDataMap>({})
+
+    const setListDataForList = (listId: List['id'], state: ListDataState) => {
+        setListDataMap(prev => {
+            const current = prev[listId];
+            if (
+                current &&
+                current.items === state.items &&
+                current.categories === state.categories
+            ) {
+                return prev; //nothing changed, don't trigger re-render
+            }
+            return {
+                ...prev,
+                [listId]: {
+                    ...current,
+                    items: state.items as List['items'],
+                    categories: state.categories,
+                },
+            };
+        });
+    };
+
 
     const changeSelectedListId = (id: List['id']) => {
         localStorage.setItem(`selectedListId: ${data?.user?.id}`, id.toString());
@@ -32,8 +61,12 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
         if (!(data?.user?.lists.length)) return // only matters if there are lists
         // Read from localStorage on client
         const saved = localStorage.getItem(`selectedListId: ${data.user.id}`);
-        const listIds = data.user?.lists?.map(list => list.id) || [];
-        if (saved && listIds.includes(saved)) setSelectedListId(saved);
+        const initialMap: ListDataMap = {}
+        data.user.lists.forEach(list => {
+            initialMap[list.id] = { ...list }
+        })
+        setListDataMap(initialMap)
+        if (saved && saved in initialMap) setSelectedListId(saved)
         else {
             // Default to first list if nothing in localStorage or id in localStorage does not exist in lists
             setSelectedListId(data.user.lists[0].id);
@@ -44,7 +77,9 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
         <ListContext.Provider
             value={{
                 user: data?.user,
-                lists: data?.user?.lists ?? [],
+                lists: data?.user?.lists.map(list => ({ id: list.id, name: list.name, itemCount: list.items.length })) ?? [],
+                listDataMap,
+                setListDataForList,
                 selectedListId,
                 setSelectedListId: changeSelectedListId,
                 loading,
