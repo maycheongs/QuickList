@@ -99,23 +99,60 @@ export const resolvers = {
                 },
             });
         },
+        updateItem: async (_: any, args: MutationUpdateItemArgs) => {
+            const { ItemId, ...rest } = args;
 
-        updateItem: async (
-            _: any,
-            args: MutationUpdateItemArgs
-        ) => {
-            return prisma.item.update({
-                where: { id: args.ItemId },
-                data: {
-                    name: args.name,
-                    checked: args.checked,
-                    lastMinute: args.lastMinute,
-                    isTask: args.isTask,
-                    categoryId: args.categoryId,
-                    assignedToId: args.assignedToId,
-                },
+            const updateData = Object.fromEntries(Object.entries(rest).filter(([_, value]) => value !== undefined))
+            let deletedCategory: any = null
+
+            // If categoryId is not being updated, just update the item and return
+            if (!('categoryId' in updateData)) {
+                const updated = await prisma.item.update({
+                    where: { id: ItemId },
+                    data: updateData,
+                    include: { category: true, assignedTo: true }
+                });
+                return { item: updated, deletedCategory }
+            }
+
+            // If categoryId is being updated, handle category deletion logic in a transaction
+            return prisma.$transaction(async (tx) => {
+                // Get current category of the item
+                const currentItem = await tx.item.findUnique({
+                    where: { id: ItemId },
+                    select: { category: true },
+                });
+
+                const previousCategoryId = currentItem?.category?.id;
+
+                // Update the item
+                const updatedItem = await tx.item.update({
+                    where: { id: ItemId },
+                    data: updateData,
+                    include: { category: true, assignedTo: true }
+                });
+
+
+
+                // If previous category exists and is different from the new category
+                if (
+                    previousCategoryId &&
+                    updateData.categoryId !== previousCategoryId
+                ) {
+                    await tx.category.deleteMany({
+                        where: {
+                            id: previousCategoryId,
+                            items: { none: {} },     //delete the category only if it has no items
+                        },
+                    });
+                    deletedCategory = currentItem.category
+                }
+                console.log('updated item', updatedItem, 'deletedCat', deletedCategory)
+
+                return { item: updatedItem, deletedCategory };
             });
-        },
+        }
+        ,
 
 
         deleteItem: async (_: any, args: MutationDeleteItemArgs) => {
@@ -146,7 +183,7 @@ export const resolvers = {
                 }
             }
 
-            return { ...item, deletedCategory };
+            return { item, deletedCategory };
         },
 
         addUser: async (_: any, args: { listId: QueryListArgs['id']; userId: QueryUserArgs['id'] }) => {

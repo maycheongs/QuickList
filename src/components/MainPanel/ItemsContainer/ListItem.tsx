@@ -1,24 +1,34 @@
 
-import { useState, useRef } from 'react';
-import { Box, HStack, Text, Checkbox, Badge, Button, IconButton, Menu, Icon } from '@chakra-ui/react';
-import { Settings, Zap } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Box, HStack, Text, Checkbox, Badge, Button, IconButton, Menu, Icon, Input } from '@chakra-ui/react';
+import { Settings, Zap, Trash } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useDeleteItem, useUpdateItem, useAddCategory } from '@/contexts/list-data/listDataOperations';
+import { useListDataDispatch } from '@/contexts/list-data/ListDataContext';
 
-import { Item } from '.';
-import { clear } from 'console';
+import { Item, Category } from '.';
+import { useListDataState } from '@/contexts/list-data/ListDataContext';
+import { types } from 'util';
 
 interface ListItemProps {
     item: Item;
-    onToggleCheck: (itemId: number) => void;
-    onToggleLastMinute: (itemId: number) => void;
-    onSetCategory: (itemId: number, category: string | null) => void;
-    categories: { id: number; name: string }[];
+    onToggleCheck: (itemId: Item['id']) => void;
+    onToggleLastMinute: (itemId: Item['id']) => void;
+    categories: Category[];
     color?: string;
 }
 
 
-const ListItem = ({ item, onToggleCheck, onToggleLastMinute, onSetCategory, categories, color }: ListItemProps) => {
+const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }: ListItemProps) => {
+    const deleteItem = useDeleteItem()
+    const updateItem = useUpdateItem()
+    const addCategory = useAddCategory()
+    const dispatch = useListDataDispatch()
+    const { id: selectedListId } = useListDataState()
+
     const [open, setOpen] = useState(false);
+    const [newCategory, setNewCategory] = useState('')
+    const categoryInputRef = useRef<HTMLInputElement>(null)
     const triggerRef = useRef<HTMLButtonElement | null>(null); //access DOM elements directly
     const menuRef = useRef<HTMLDivElement | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -37,6 +47,73 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, onSetCategory, cate
         }, 300)
     }
 
+    const handleDeleteItem = async () => {
+        console.log('deleting item', item.name)
+        await deleteItem(item.id)
+    }
+
+    const toggleCheck = (checked: boolean, itemId: Item['id']) => {
+        updateItem(itemId, { checked })
+    }
+
+    const toggleLastMinute = (lastMinute: boolean, itemId: Item['id']) => {
+        updateItem(itemId, { lastMinute: !lastMinute })
+    }
+
+    const onSetCategory = (category: Category | null, itemId: Item['id']) => {
+        console.log('setting category', category)
+        updateItem(itemId, { category })
+    }
+
+    const createCategory = async (category: string) => {
+        if (!selectedListId) return
+        return await addCategory(category, selectedListId)
+    }
+
+    const handleSubmitCategory = async (e: React.FormEvent) => {
+        e.preventDefault()
+        const category = newCategory.trim()
+        if (!category) return
+        const existingCategory = categories.find(c => c.name === category)
+        if (existingCategory) updateItem(item.id, { category: existingCategory })
+        else {
+            const prevItem = { ...item }
+            //optimically update item with new category
+            dispatch({ type: "UPDATE_ITEM", id: item.id, changes: { category: { id: `temp-${Date.now()}`, name: category } } })
+            //wait for the real category to create then actually update the item
+            try {
+                const createdCategory = await createCategory(category)
+                if (createdCategory?.id) {
+                    const result = await updateItem(item.id, { category: createdCategory })
+                    if (!result.success) throw Error
+                }
+            } catch {
+                //if fails, roll back to previous item state
+                dispatch({ type: "UPDATE_ITEM", id: item.id, changes: prevItem })
+            }
+        }
+    }
+
+    const handleTypeCategory = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const typed = e.target.value
+        const match = typed.length && categories.find(c => c.name.toLowerCase().startsWith(typed.toLowerCase()))
+
+        if (match && match.name.length > typed.length) {
+            console.log('dpes this')
+            setNewCategory(match.name)
+            requestAnimationFrame(() => {
+                e.target.setSelectionRange(typed.length, match.name.length)
+            })
+        } else setNewCategory(typed)
+    }
+
+    const handleBackspace = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        e.preventDefault()
+        if (!newCategory) return
+        const caretPos = e.currentTarget.selectionStart
+        setNewCategory(prev => prev.slice(0, (caretPos || 1) - 1))
+    }
+
 
 
 
@@ -53,7 +130,7 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, onSetCategory, cate
             <HStack gap={3}>
                 <Checkbox.Root
                     checked={item.checked}
-                    onCheckedChange={() => onToggleCheck(item.id)}
+                    onCheckedChange={(details) => toggleCheck(details.checked === true, item.id)}
                     size="sm"
                 >
                     <Checkbox.HiddenInput />
@@ -81,7 +158,7 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, onSetCategory, cate
                         <Button
                             size="xs"
                             variant="ghost"
-                            onClick={() => onToggleLastMinute(item.id)}
+                            onClick={() => toggleLastMinute(item.lastMinute, item.id)}
                             _hover={{ bg: 'transparent' }}
                         >
                             <Icon fill={item.lastMinute ? 'inherit' : 'none'}><Zap /></Icon>
@@ -99,27 +176,47 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, onSetCategory, cate
                         <Menu.Positioner>
                             <Menu.Content ref={menuRef} onMouseLeave={handleMouseLeaveMenu}>
                                 <Menu.Item disabled value='set-category'>
-                                    <Text fontSize="xs" fontWeight="medium" color="gray.500">
-                                        Set Category
-                                    </Text>
+                                    <Box as="form" px={2} py={1} onSubmit={handleSubmitCategory}>
+                                        <Input
+                                            size="sm"
+                                            placeholder="Type or pick a category"
+                                            value={newCategory}
+                                            onChange={(e) => handleTypeCategory(e)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") handleSubmitCategory(e);
+                                                if (e.key === "Backspace") handleBackspace(e)
+                                                if (e.key === " ") {
+                                                    e.stopPropagation() // Prevent menu from closing or other interference
+                                                }
+
+                                            }}
+                                        />
+                                    </Box>
                                 </Menu.Item>
                                 <Menu.Separator />
                                 {categories.map(category => (
                                     <Menu.Item
                                         value={category.name}
-                                        onClick={() => onSetCategory(item.id, category.name)}
+                                        onClick={() => onSetCategory(category, item.id)}
                                     >
                                         {category.name}
                                     </Menu.Item>
                                 ))}
                                 <Menu.Separator />
-                                <Menu.Item value='remove-category' onClick={() => onSetCategory(item.id, null)}>
+                                <Menu.Item value='remove-category' onClick={() => onSetCategory(null, item.id)}>
                                     Remove category
                                 </Menu.Item>
                             </Menu.Content>
                         </Menu.Positioner>
 
                     </Menu.Root>
+                    <IconButton size="xs"
+                        variant="ghost"
+                        _hover={{ bg: 'transparent' }}
+                        onClick={handleDeleteItem}
+                    >
+                        <Trash />
+                    </IconButton>
                 </HStack>
             </HStack>
         </Box>

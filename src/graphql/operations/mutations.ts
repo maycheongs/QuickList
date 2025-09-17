@@ -106,16 +106,22 @@ export const UPDATE_ITEM_MUTATION = gql`
       categoryId: $categoryId
       assignedToId: $assignedToId
     ) {
-      id
-      name
-      checked
-      lastMinute
-      isTask
-      category {
+      item {
         id
         name
+        checked
+        lastMinute
+        isTask
+        category {
+          id
+          name
+        }
+        assignedTo {
+          id
+          name
+        }
       }
-      assignedTo {
+      deletedCategory {
         id
         name
       }

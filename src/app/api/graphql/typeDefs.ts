@@ -17,12 +17,17 @@ type DeleteItemResult {
   deletedCategory: Category
 }
 
+type UpdateItemPayload {
+  item: Item!
+  deletedCategory: Category
+}
+
 type Mutation {
     createUser(name: String!, email: String!): User!
     createList(name: String!, type: ListType!, userId: ID!): List!
     deleteList(listId:ID!): List!
-    addItemToList(listId: ID!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
-    updateItem(ItemId: ID!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: Int, assignedToId: Int, reminderAt: String, recurrence: String, recurrenceEnd: String ): Item!
+    addItemToList(listId: ID!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
+    updateItem(ItemId: ID!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: String, recurrence: String, recurrenceEnd: String ): UpdateItemPayload!
     deleteItem(itemId: ID!): DeleteItemResult!
     addUser(listId: ID!, userId: ID!): List!
     duplicateList(listId: ID!): List!

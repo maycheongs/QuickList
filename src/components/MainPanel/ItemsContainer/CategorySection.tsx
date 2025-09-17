@@ -3,6 +3,7 @@
 import { Box, VStack, Badge } from '@chakra-ui/react';
 import ListItem from './ListItem'
 import { Item } from '.';
+import { useListDataState } from '@/contexts/list-data/ListDataContext';
 
 type CategorySectionProps = {
     categoryKey?: string | null;
@@ -14,9 +15,11 @@ type CategorySectionProps = {
 
 function CategorySection({ categoryKey, items, isChecked, isLastMinute, color }: CategorySectionProps) {
 
-    console.log('ischecked', isChecked, 'items', items);
+    // console.log('ischecked', isChecked, 'items', items);
 
-    const [categoryId, categoryName] = categoryKey ? categoryKey.split('-') : [null, null];
+    const { categories } = useListDataState()
+
+    const [categoryId, categoryName] = categoryKey ? categoryKey.split('_') : [null, null];
 
 
     return (
