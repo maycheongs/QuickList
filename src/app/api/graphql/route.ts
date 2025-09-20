@@ -139,13 +139,13 @@ export const resolvers = {
                     previousCategoryId &&
                     updateData.categoryId !== previousCategoryId
                 ) {
-                    await tx.category.deleteMany({
+                    const { count } = await tx.category.deleteMany({
                         where: {
                             id: previousCategoryId,
                             items: { none: {} },     //delete the category only if it has no items
                         },
                     });
-                    deletedCategory = currentItem.category
+                    if (count > 0) deletedCategory = currentItem.category
                 }
                 console.log('updated item', updatedItem, 'deletedCat', deletedCategory)
 
