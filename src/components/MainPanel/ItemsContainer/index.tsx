@@ -79,7 +79,7 @@ const ItemsContainer = () => {
 
                     {/* Categories */}
                     {Object.keys(categorized).length ?
-                        Object.entries(categorized).map(([categoryKey, items], index) => (
+                        Object.entries(categorized).sort().map(([categoryKey, items], index) => (
                             <CategorySection
                                 categoryKey={categoryKey}
                                 items={items}
