@@ -45,13 +45,16 @@ function AddItemBar({ categories }: AddItemBarProps) {
             bottom={2}
             zIndex='docked'
             pt={2}
-            bgColor="rgba(229, 231, 235, 0.85)"
+            mr={3}
+
         >
             <Box
                 borderRadius="sm"
                 bg={`gray.50`}
                 px={2}
                 py={1}
+                border={"2px dotted"}
+                borderColor='gray.200'
             >
                 <HStack gap={3}>
                     <Editable.Root submitMode='none' value={itemName} onValueChange={(e) => setItemName(e.value)} placeholder="Add Item" onKeyDown={(e) => handleHitEnter(e)}

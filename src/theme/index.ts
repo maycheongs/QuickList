@@ -19,9 +19,13 @@ const customConfig = defineConfig({
         }
     },
     globalCss: {
-        "body": {
+        "html, body": {
             background: BG_DEFAULT,
+            color: 'gray.700'
         },
+        "*": {
+            color: "inherit"
+        }
 
     },
 })

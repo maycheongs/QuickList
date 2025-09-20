@@ -1,10 +1,10 @@
 
 import { useState, forwardRef } from 'react';
 import { List } from '@/graphql/codegen'
-import { Box, Heading, HStack, VStack, IconButton, Text } from '@chakra-ui/react';
+import { Box, Heading, HStack, VStack, IconButton, Text, Editable } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
 import DatePicker from 'react-datepicker';
-import { Calendar } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface ListHeaderProps {
@@ -22,7 +22,7 @@ const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
                     ref={ref}
                     variant="outline"
                     size="sm"
-                > <Calendar />
+                > <CalendarDays />
                 </IconButton>
             </Tooltip>
         );
@@ -36,8 +36,9 @@ const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
                 ref={ref}
                 cursor="pointer"
                 _hover={{ textDecoration: "underline" }}
+                color='gray.600'
             >
-                <span style={{ display: "inline-flex", verticalAlign: "bottom" }}><Calendar /></span> Due: {value}
+                <span style={{ display: "inline-flex", verticalAlign: "bottom" }}><CalendarDays /></span> Due: {value}
             </Text>
             <IconButton
                 aria-label="Clear date"
@@ -65,8 +66,8 @@ const ListHeader = ({ list }: ListHeaderProps) => {
 
     return (
         <Box py={3} px={6} borderBottom="1px solid" borderColor="gray.200" position="sticky" top={0} bg="background" zIndex='docked' opacity='0.98'>
-            <VStack gap={4} align="start">
-                <Heading size="xl" fontWeight='bold'>{list.name}</Heading>
+            <VStack gap={2} align="start">
+                <Heading size="2xl" fontWeight='bold'>{list.name}</Heading>
                 <DatePicker
                     selected={dueDate}
                     onChange={changeDueDate}

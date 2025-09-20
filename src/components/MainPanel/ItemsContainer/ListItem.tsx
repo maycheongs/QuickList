@@ -74,7 +74,7 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }
         e.preventDefault()
         const category = newCategory.trim()
         if (!category) return
-        const existingCategory = categories.find(c => c.name === category)
+        const existingCategory = categories.find(c => c.name.trim() === category)
         if (existingCategory) updateItem(item.id, { category: existingCategory })
         else {
             const prevItem = { ...item }
@@ -123,9 +123,12 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }
             py={1}
             px={2}
             borderRadius="sm"
-            _hover={{ bg: `whiteAlpha.800` }}
+            _hover={{ bg: `gray.100` }}
             transition="all 0.2s"
-            bg={`whiteAlpha.700`}
+            borderLeft={(item.lastMinute && !item.checked) ? "3px solid" : undefined}
+            borderLeftColor={(item.lastMinute && !item.checked) ? "yellow.400" : undefined}
+            bg={(item.lastMinute && !item.checked) ? "yellow.50" : "inherit"}
+            opacity={item.checked ? 0.6 : 1}
         >
             <HStack gap={3}>
                 <Checkbox.Root
@@ -141,17 +144,60 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }
                 <Text
                     flex={1}
                     textDecoration={item.checked ? 'line-through' : 'none'}
-                    color={item.checked ? 'gray.500' : 'gray.900'}
+                    color={item.checked ? 'gray.500' : 'inherit'}
                 >
                     {item.name}
                 </Text>
 
-                {(item.category && (item.checked || item.lastMinute)) ? (
-                    <Badge colorPalette={item.color} variant="subtle">
-                        {item.category.name}
-                    </Badge>
-                ) : ''}
+                <Menu.Root open={open} onOpenChange={e => setOpen(e.open)} onHighlightChange={({ highlightedValue }) => { if (highlightedValue && categories.map(c => c.name).includes(highlightedValue)) setNewCategory(highlightedValue) }}>
 
+                    <Menu.Trigger asChild ref={triggerRef} onMouseLeave={handleMouseLeaveMenu} >
+                        {/* <IconButton variant="ghost" size="xs" _hover={{ bg: 'transparent' }} _expanded={{ bg: 'transparent' }}>
+                                <Icon ><Settings /></Icon>
+                            </IconButton> */}
+                        {/* <Tooltip content="Add/Change Category"> */}
+                        <Badge colorPalette={item.color} variant="subtle" >
+                            {item.category ? item.category.name : 'Category'}
+                        </Badge>
+                        {/* </Tooltip> */}
+                    </Menu.Trigger>
+                    <Menu.Positioner>
+                        <Menu.Content ref={menuRef} onMouseLeave={handleMouseLeaveMenu}>
+                            <Menu.Item disabled value='set-category'>
+                                <Box as="form" px={2} py={1} onSubmit={handleSubmitCategory}>
+                                    <Input
+                                        size="sm"
+                                        placeholder="Type or pick a category"
+                                        value={newCategory}
+                                        onChange={(e) => handleTypeCategory(e)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") handleSubmitCategory(e);
+                                            if (e.key === "Backspace") handleBackspace(e)
+                                            if (e.key === " ") {
+                                                e.stopPropagation() // Prevent menu from closing or other interference
+                                            }
+
+                                        }}
+                                    />
+                                </Box>
+                            </Menu.Item>
+                            <Menu.Separator />
+                            {categories.filter(cat => cat.id !== item.category?.id).map(category => (
+                                <Menu.Item
+                                    value={category.name}
+                                    onClick={() => onSetCategory(category, item.id)}
+                                >
+                                    {category.name}
+                                </Menu.Item>
+                            ))}
+                            <Menu.Separator />
+                            <Menu.Item value='remove-category' onClick={() => onSetCategory(null, item.id)}>
+                                Remove category
+                            </Menu.Item>
+                        </Menu.Content>
+                    </Menu.Positioner>
+
+                </Menu.Root>
                 <HStack gap={1} opacity={0} _groupHover={{ opacity: 1 }}>
                     <Tooltip content={!item.lastMinute ? "Mark as last minute" : "Unmark last minute"} >
 
@@ -166,57 +212,15 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }
 
                     </Tooltip>
 
-                    <Menu.Root open={open} onOpenChange={e => setOpen(e.open)}>
-
-                        <Menu.Trigger asChild ref={triggerRef} onMouseLeave={handleMouseLeaveMenu} >
-                            <IconButton variant="ghost" size="xs" _hover={{ bg: 'transparent' }} _expanded={{ bg: 'transparent' }}>
-                                <Icon ><Settings /></Icon>
-                            </IconButton>
-                        </Menu.Trigger>
-                        <Menu.Positioner>
-                            <Menu.Content ref={menuRef} onMouseLeave={handleMouseLeaveMenu}>
-                                <Menu.Item disabled value='set-category'>
-                                    <Box as="form" px={2} py={1} onSubmit={handleSubmitCategory}>
-                                        <Input
-                                            size="sm"
-                                            placeholder="Type or pick a category"
-                                            value={newCategory}
-                                            onChange={(e) => handleTypeCategory(e)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") handleSubmitCategory(e);
-                                                if (e.key === "Backspace") handleBackspace(e)
-                                                if (e.key === " ") {
-                                                    e.stopPropagation() // Prevent menu from closing or other interference
-                                                }
-
-                                            }}
-                                        />
-                                    </Box>
-                                </Menu.Item>
-                                <Menu.Separator />
-                                {categories.map(category => (
-                                    <Menu.Item
-                                        value={category.name}
-                                        onClick={() => onSetCategory(category, item.id)}
-                                    >
-                                        {category.name}
-                                    </Menu.Item>
-                                ))}
-                                <Menu.Separator />
-                                <Menu.Item value='remove-category' onClick={() => onSetCategory(null, item.id)}>
-                                    Remove category
-                                </Menu.Item>
-                            </Menu.Content>
-                        </Menu.Positioner>
-
-                    </Menu.Root>
-                    <IconButton size="xs"
-                        variant="ghost"
-                        _hover={{ bg: 'transparent' }}
-                        onClick={handleDeleteItem}
-                    >
-                        <Trash />
-                    </IconButton>
+                    <Tooltip content="Delete Item">
+                        <IconButton size="xs"
+                            variant="ghost"
+                            _hover={{ bg: 'transparent' }}
+                            onClick={handleDeleteItem}
+                        >
+                            <Trash />
+                        </IconButton>
+                    </Tooltip>
                 </HStack>
             </HStack>
         </Box>

@@ -17,7 +17,7 @@ function HomeContent() {
 
     return (
         <HStack align="stretch" gap={0} height="100vh">
-            <Box w="300px" borderRight="1px solid lightgray">
+            <Box w="300px" borderRight="1px solid lightgray" display={{ base: 'none', sm: 'block' }}>
                 <SidePanel />
             </Box>
             <Box flex={1}>

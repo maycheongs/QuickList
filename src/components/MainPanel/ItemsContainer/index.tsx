@@ -65,7 +65,7 @@ const ItemsContainer = () => {
         return { categorized, uncategorized, lastMinute, checked };
     };
     return (
-        <Box as="section" flex={1} py={2} px={5} bg='gray.200' position="relative" overflow="hidden">
+        <Box as="section" flex={1} py={2} px={5} position="relative" overflow="hidden">
             <Box overflowY="auto" height="100%" pb={16}>
                 <VStack gap={0} align="stretch">
                     {/* Uncategorized */}
