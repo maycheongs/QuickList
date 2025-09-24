@@ -211,7 +211,7 @@ export type CreateListMutationVariables = Exact<{
 }>;
 
 
-export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type?: ListType | null } };
+export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type?: ListType | null, createdAt: string, dueDate?: string | null, remindersOn?: boolean | null, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } };
 
 export type AddItemToListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
@@ -301,6 +301,14 @@ export const CreateListDocument = gql`
     id
     name
     type
+    users {
+      id
+      name
+      email
+    }
+    createdAt
+    dueDate
+    remindersOn
   }
 }
     `;

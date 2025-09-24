@@ -6,6 +6,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import DatePicker from 'react-datepicker';
 import { CalendarDays } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useListContext } from '@/contexts/ListContext';
 
 interface ListHeaderProps {
     list: { id: List['id'], name: List['name'], dueDate?: List['dueDate'] };
@@ -54,8 +55,9 @@ const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
 });
 
 const ListHeader = ({ list }: ListHeaderProps) => {
-    // console.log('list in header', list, 'date', list?.dueDate);
-
+    const { lists, onConfirmAddList } = useListContext();
+    console.log('list in header', list, 'date', list?.dueDate);
+    const [title, setTitle] = useState(list.name);
     const [dueDate, setDueDate] = useState<Date | null>(list.dueDate ? (new Date(Number(list.dueDate)) || null) : null);
     const changeDueDate = (date: Date | null) => {
         setDueDate(date);
@@ -63,11 +65,22 @@ const ListHeader = ({ list }: ListHeaderProps) => {
         // updateList
     };
     // console.log('duedate', list.dueDate);
+    const handleSetTitle = (newTitle: string) => {
+        setTitle(newTitle);
+        // updateList
+    }
 
     return (
         <Box py={3} px={6} borderBottom="1px solid" borderColor="gray.200" position="sticky" top={0} bg="background" zIndex='docked' opacity='0.98'>
             <VStack gap={2} align="start">
-                <Heading size="2xl" fontWeight='bold'>{list.name}</Heading>
+
+                <Editable.Root
+                    value={title} onValueChange={(e) => handleSetTitle(e.value)} placeholder="List Name"
+                >
+                    <Editable.Preview fontSize='2xl' fontWeight={'bold'} />
+                    <Editable.Input fontSize='2xl' fontWeight={'bold'} />
+                </Editable.Root>
+
                 <DatePicker
                     selected={dueDate}
                     onChange={changeDueDate}

@@ -8,6 +8,14 @@ export const CREATE_LIST = gql`
       id
       name
       type
+      users {
+        id
+        name
+        email
+      }
+      createdAt
+      dueDate
+      remindersOn 
     }
   }
 `;

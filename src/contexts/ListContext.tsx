@@ -2,10 +2,12 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useListsByUserQuery, ListsByUserQuery, User } from '@/graphql/codegen';
+import { useListsByUserQuery, ListsByUserQuery, User, useCreateListMutation, ListType, } from '@/graphql/codegen';
 import { ListDataState } from './list-data/listDataReducer';
 
+//test user
 
+const seedUser = { name: "Alice", email: "alice@example.com", id: "test-id" }
 type ListContextType = {
     lists: { id: List['id'], name: List['name'], dueDate?: List['dueDate'] }[];
     selectedListId: List['id'] | null;
@@ -14,16 +16,28 @@ type ListContextType = {
     error: Error | undefined;
     user: ListsByUserQuery['user'];
     listDataMap: ListDataMap;
-    setListDataForList: (listId: List['id'], state: ListDataState) => void
+    setListDataForList: (listId: List['id'], state: ListDataState) => void;
+    optimisticAddList: (name: List['name']) => Promise<void>;
+    onConfirmAddList: (name: List['name'], tempId: string) => Promise<void>;
 };
-
-type List = NonNullable<ListsByUserQuery['user']>['lists'][0]
+type GqlList = NonNullable<ListsByUserQuery['user']>['lists'][0]
+type OptimisticList = Partial<GqlList> & {
+    id: GqlList['id'];  // always required
+    items: GqlList['items']; // always required
+    categories: GqlList['categories']; // always required
+    dueDate: GqlList['dueDate'];
+    name: GqlList['name'];
+    users: GqlList['users'];
+    isNew?: true;
+};
+type List = GqlList | OptimisticList
 type ListDataMap = Record<string, List>
 
 const ListContext = createContext<ListContextType | undefined>(undefined);
 
 export function ListProvider({ children }: { children: React.ReactNode }) {
-    const { data, loading, error } = useListsByUserQuery({ variables: { userId: "test-id" } }); // Replace with actual user ID or context
+    const { data, loading, error } = useListsByUserQuery({ variables: { userId: seedUser.id } }); // Replace with actual user ID or context
+    const [createList] = useCreateListMutation()
     const [selectedListId, setSelectedListId] = useState<List['id'] | null>(null);
     const [listDataMap, setListDataMap] = useState<ListDataMap>({})
 
@@ -73,6 +87,22 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
         }
     }, [data?.user?.id]);
 
+
+    const optimisticAddList = async (name: List['name']) => {
+        const tempId = `temp-${Date.now()}`
+        const optimisticList: List = { id: tempId, name: 'New List', dueDate: null, items: [], isNew: true, categories: [], users: [seedUser] }
+        setListDataMap(prev => ({ ...prev, [tempId]: optimisticList }))
+        setSelectedListId(tempId)
+    }
+
+    const onConfirmAddList = async (name: List['name'], tempId: string) => {
+        // optimistic UI update with new list name if different from default
+        // create and fetch list id from server
+        // add into listDataMap, remove temp list
+        // set selectedListId to new list id
+        // if error remove the temp list 
+    }
+
     return (
         <ListContext.Provider
             value={{
@@ -82,6 +112,8 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
                 setListDataForList,
                 selectedListId,
                 setSelectedListId: changeSelectedListId,
+                optimisticAddList,
+                onConfirmAddList,
                 loading,
                 error
             }}

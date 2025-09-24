@@ -7,7 +7,7 @@ import { ListPlus } from 'lucide-react'
 
 
 export default function SidePanel() {
-    const { selectedListId, setSelectedListId, user, lists, loading, error } = useListContext();
+    const { selectedListId, setSelectedListId, user, lists, loading, error, optimisticAddList } = useListContext();
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 

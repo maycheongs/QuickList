@@ -37,15 +37,18 @@ export default function MainPanel() {
     const listHeaderData = {
         ...(listData.dueDate != null && { dueDate: listData.dueDate }),
         id: listData.id,
-        name: listData.name
+        name: listData.name,
+        isNew: 'isNew' in listData ? listData.isNew : undefined
     };
+
+    console.log('listData in MainPanel', listData, 'headerData', listHeaderData)
 
 
 
     return (
         <Box as="main" fontSize={14} height='100vh' display="flex" flexDirection="column">
-            <ListDataProvider key={selectedListId} initialState={{ id: selectedListId, items: listData.items, categories: listData.categories }}>
-                <ListHeader list={listHeaderData} />
+            <ListDataProvider initialState={{ id: selectedListId, name: listData.name, items: listData.items, categories: listData.categories }}>
+                <ListHeader key={selectedListId} list={listHeaderData} />
                 <ItemsContainer />
                 <SyncListDataWithContext listId={selectedListId} />
             </ListDataProvider>

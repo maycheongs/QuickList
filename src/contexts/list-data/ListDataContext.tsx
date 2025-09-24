@@ -1,7 +1,7 @@
 //contexts/list-data/ListDataContext.tsx
 'use client';
 
-import { createContext, useReducer, useContext, ReactNode } from "react";
+import { createContext, useReducer, useContext, ReactNode, useEffect } from "react";
 import { listDataReducer } from "./listDataReducer";
 import type { ListDataAction, ListDataState } from "./listDataReducer";
 
@@ -15,7 +15,17 @@ export function ListDataProvider({
     children: ReactNode;
     initialState?: ListDataState;
 }) {
-    const [state, dispatch] = useReducer(listDataReducer, initialState || { id: '', items: [], categories: [] });
+    const [state, dispatch] = useReducer(listDataReducer, initialState || null);
+
+    // Sync with new initialState when it changes
+    useEffect(() => {
+        if (!initialState || !state) return;
+
+        // Only update if the ID changed or state is out of sync
+        if (state.id !== initialState.id) {
+            dispatch({ type: 'SET_DATA', payload: initialState });
+        }
+    }, [initialState, state?.id]);
 
     return (
         <ListDataStateContext.Provider value={state}>
