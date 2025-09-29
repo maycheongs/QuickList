@@ -1,16 +1,20 @@
+//src/components/MainPanel/ListHeader.tsx
 
-import { useState, forwardRef } from 'react';
-import { List } from '@/graphql/codegen'
+import { useState, useEffect, forwardRef, useRef } from 'react';
+import { OptimisticList } from '@/contexts/types'
 import { Box, Heading, HStack, VStack, IconButton, Text, Editable } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
 import DatePicker from 'react-datepicker';
 import { CalendarDays } from 'lucide-react';
+import { useUpdateList } from '@/contexts/AppDataOperations';
+import { useAppData } from '@/contexts/AppContext';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useListContext } from '@/contexts/ListContext';
+
 
 interface ListHeaderProps {
-    list: { id: List['id'], name: List['name'], dueDate?: List['dueDate'] };
+    list: Partial<OptimisticList> | null;
 }
+
 
 const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
     if (!value) {
@@ -55,10 +59,24 @@ const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
 });
 
 const ListHeader = ({ list }: ListHeaderProps) => {
-    const { lists, onConfirmAddList } = useListContext();
-    console.log('list in header', list, 'date', list?.dueDate);
-    const [title, setTitle] = useState(list.name);
-    const [dueDate, setDueDate] = useState<Date | null>(list.dueDate ? (new Date(Number(list.dueDate)) || null) : null);
+    const updateList = useUpdateList()
+    const { state } = useAppData();
+    const [title, setTitle] = useState(list?.name || '');
+    const [isEditing, setIsEditing] = useState(list?.isNew || false);
+    const [listDueDate, setDueDate] = useState<Date | null>(list?.dueDate ? (new Date(Number(list.dueDate)) || null) : null);
+
+    useEffect(() => {
+
+        console.log('list changed, list.IsNew: ', list?.isNew);
+        setIsEditing(list?.isNew || false);
+
+        return () => {
+            setIsEditing(false);
+        }
+
+    }, [list?.id])
+
+
     const changeDueDate = (date: Date | null) => {
         setDueDate(date);
         // console.log('new date', date);

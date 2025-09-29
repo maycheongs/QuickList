@@ -1,13 +1,28 @@
 //src/components/SidePanel.tsx
 'use client';
 
-import { VStack, Heading, Box, HStack, Separator, Button, Text, IconButton } from '@chakra-ui/react';
-import { useListContext } from '../contexts/ListContext';
+import { useState, useEffect } from 'react';
+import { VStack, Heading, Box, HStack, Separator, Button, Text, IconButton, Menu, Portal } from '@chakra-ui/react';
 import { ListPlus } from 'lucide-react'
+import { useAppData } from '@/contexts/AppContext';
+import { useAddList, useDeleteList } from '@/contexts/AppDataOperations';
+
+interface SidePanelProps {
+    lists: { id: string; name: string; dueDate?: string | null }[];
+    selectedListId: string | null;
+}
 
 
-export default function SidePanel() {
-    const { selectedListId, setSelectedListId, user, lists, loading, error, optimisticAddList } = useListContext();
+export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
+    const { state, error, loading, setSelectedList } = useAppData();
+    const [addDisabled, setAddDisabled] = useState(false)
+    //right-click menu
+    const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+    const [menuListId, setMenuListId] = useState<string | null>(null);
+
+
+    const addList = useAddList()
+    const deleteList = useDeleteList()
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 

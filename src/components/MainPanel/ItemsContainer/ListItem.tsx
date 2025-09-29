@@ -3,28 +3,27 @@ import React, { useState, useRef } from 'react';
 import { Box, HStack, Text, Checkbox, Badge, Button, IconButton, Menu, Icon, Input } from '@chakra-ui/react';
 import { Settings, Zap, Trash } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
-import { useDeleteItem, useUpdateItem, useAddCategory } from '@/contexts/list-data/listDataOperations';
-import { useListDataDispatch } from '@/contexts/list-data/ListDataContext';
+import { useDeleteItem, useUpdateItem, useAddCategory } from '@/contexts/AppDataOperations';
+
 
 import { Item, Category } from '.';
-import { useListDataState } from '@/contexts/list-data/ListDataContext';
-import { types } from 'util';
+
+import { useAppData } from '@/contexts/AppContext';
+
 
 interface ListItemProps {
     item: Item;
-    onToggleCheck: (itemId: Item['id']) => void;
-    onToggleLastMinute: (itemId: Item['id']) => void;
     categories: Category[];
-    color?: string;
+    optimisticDeleteCategoryIfEmpty: (listId: string, categoryId: string, itemId: string) => void;
 }
 
 
-const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }: ListItemProps) => {
+const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListItemProps) => {
     const deleteItem = useDeleteItem()
     const updateItem = useUpdateItem()
     const addCategory = useAddCategory()
-    const dispatch = useListDataDispatch()
-    const { id: selectedListId } = useListDataState()
+    const { state, dispatch } = useAppData()
+    const { selectedListId: listId } = state
 
     const [open, setOpen] = useState(false);
     const [newCategory, setNewCategory] = useState('')
@@ -73,23 +72,24 @@ const ListItem = ({ item, onToggleCheck, onToggleLastMinute, categories, color }
     const handleSubmitCategory = async (e: React.FormEvent) => {
         e.preventDefault()
         const category = newCategory.trim()
-        if (!category) return
+        if (category === item.category?.name) return //no change
+        setOpen(false)
+        if (!category || !listId) return
         const existingCategory = categories.find(c => c.name.trim() === category)
-        if (existingCategory) updateItem(item.id, { category: existingCategory })
+        if (existingCategory) updateItem(listId, item.id, { category: existingCategory })
         else {
             const prevItem = { ...item }
             //optimically update item with new category
-            dispatch({ type: "UPDATE_ITEM", id: item.id, changes: { category: { id: `temp-${Date.now()}`, name: category } } })
+            dispatch({ type: "UPDATE_ITEM", payload: { listId, id: item.id, changes: { category: { id: `temp-${Date.now()}`, name: category } } } })
             //wait for the real category to create then actually update the item
             try {
                 const createdCategory = await createCategory(category)
                 if (createdCategory?.id) {
-                    const result = await updateItem(item.id, { category: createdCategory })
-                    if (!result.success) throw Error
+                    const result = await updateItem(listId, item.id, { category: createdCategory })
+                    if (!result.success) throw new Error
                 }
             } catch {
-                //if fails, roll back to previous item state
-                dispatch({ type: "UPDATE_ITEM", id: item.id, changes: prevItem })
+                dispatch({ type: "ADD_CATEGORY", payload: { listId, category: prevItem.category! } }) //re-add old category if it existed               
             }
         }
     }

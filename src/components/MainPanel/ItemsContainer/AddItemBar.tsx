@@ -4,8 +4,7 @@ import { Box, HStack, Text, IconButton, ForProps, useListCollection } from '@cha
 import { Editable } from '@chakra-ui/react'
 import { Plus } from 'lucide-react';
 import { Category } from '.'
-import { useAddItem } from '@/contexts/list-data/listDataOperations';
-import { useListContext } from '@/contexts/ListContext';
+import { useAddItem } from '@/contexts/AppDataOperations';
 import { BiTrim } from 'react-icons/bi';
 
 
@@ -17,7 +16,6 @@ interface AddItemBarProps {
 function AddItemBar({ categories }: AddItemBarProps) {
 
     const addItem = useAddItem()
-    const { selectedListId } = useListContext()
     const [itemName, setItemName] = useState('');
     const [currentCategory, setCurrentCategory] = useState(null)
     const [isLastMinute, setIsLastMinute] = useState(false)

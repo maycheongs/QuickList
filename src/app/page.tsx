@@ -1,16 +1,16 @@
 'use client';
 
 import { ApolloWrapper } from '@/components/ApolloWrapper';
-import { ListProvider } from '@/contexts/ListContext';
+import { AppDataProvider } from '@/contexts/AppContext';
 import HomeContent from '@/components/Home';
 
 export default function HomePage() {
 
   return (
     <ApolloWrapper>
-      <ListProvider>
+      <AppDataProvider>
         <HomeContent />
-      </ListProvider>
+      </AppDataProvider>
     </ApolloWrapper>
   );
 }

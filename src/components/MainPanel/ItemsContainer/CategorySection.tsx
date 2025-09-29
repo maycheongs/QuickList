@@ -3,7 +3,8 @@
 import { Box, VStack, HStack, Badge, Separator } from '@chakra-ui/react';
 import ListItem from './ListItem'
 import { Item } from '.';
-import { useListDataState } from '@/contexts/list-data/ListDataContext';
+import { useAppData } from '@/contexts/AppContext';
+
 
 type CategorySectionProps = {
     categoryKey?: string | null;
@@ -13,11 +14,11 @@ type CategorySectionProps = {
     color: string;
 };
 
-function CategorySection({ categoryKey, items, isChecked, isLastMinute, color }: CategorySectionProps) {
+function CategorySection({ categoryKey, items, isChecked, isLastMinute, color, categories }: CategorySectionProps) {
+
+    const { dispatch } = useAppData();
 
     // console.log('ischecked', isChecked, 'items', items);
-
-    const { categories } = useListDataState()
 
     const [categoryId, categoryName] = categoryKey ? categoryKey.split('_') : [null, null];
 
@@ -47,10 +48,8 @@ function CategorySection({ categoryKey, items, isChecked, isLastMinute, color }:
                     <ListItem
                         key={item.id}
                         item={item}
-                        onToggleCheck={(item) => { console.log('toggle check', item) }}
-                        onToggleLastMinute={(item) => { console.log('toggle last minute', item) }}
                         categories={categories}
-                        color={color}
+                        optimisticDeleteCategoryIfEmpty={optimisticDeleteCategoryIfEmpty}
                     />
                 ))}
             </VStack>

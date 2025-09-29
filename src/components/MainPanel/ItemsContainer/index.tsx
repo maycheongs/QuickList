@@ -4,7 +4,7 @@ import { GetListQuery } from '@/graphql/codegen';
 import { Box, VStack } from '@chakra-ui/react';
 import CategorySection from './CategorySection';
 import AddItemBar from './AddItemBar';
-import { useListDataState } from '@/contexts/list-data/ListDataContext';
+
 
 export type Item = NonNullable<GetListQuery['list']>['items'][0] & { color?: string; };
 export type Category = NonNullable<GetListQuery['list']>['categories'][0];
@@ -20,10 +20,13 @@ interface OrganizedItems {
 
 const categoryColors = ['blue', 'green', 'purple', 'red', 'orange', 'pink', 'yellow', 'teal', 'cyan', 'gray'];
 
+interface ItemsContainerProps {
+    list: List;
+}
 
-const ItemsContainer = () => {
+const ItemsContainer = ({ list }: ItemsContainerProps) => {
 
-    const { items, categories } = useListDataState()
+    const { items, categories } = list
 
 
     const categoryColorMap: Record<Category['id'], string> = {};
