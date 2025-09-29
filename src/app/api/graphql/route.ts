@@ -4,7 +4,7 @@ import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { getPrismaClient } from "@/lib/prisma";
 import { typeDefs } from "./typeDefs";
 import { NextRequest } from "next/server";
-import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdateItemArgs, MutationDeleteItemArgs, MutationUpdateCategoryArgs, Category } from "@/graphql/codegen";
+import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdateItemArgs, MutationDeleteItemArgs, MutationUpdateCategoryArgs, MutationUpdateListArgs } from "@/graphql/codegen";
 
 
 const prisma = getPrismaClient();
@@ -22,7 +22,7 @@ export const resolvers = {
                 where: { id: args.id },
                 include: {
                     lists: {
-                        orderBy: { createdAt: 'desc' },
+                        orderBy: { createdAt: 'asc' },
                         include:
                         {
                             items: {
@@ -75,12 +75,22 @@ export const resolvers = {
         },
 
         createList: async (_: any, args: { name: string; type: 'TASK' | 'PACKING'; userId: QueryUserArgs['id'] }) => {
+            console.log('CREATE LIST IN RESOLVERS', args);
             return prisma.list.create({
                 data: {
                     name: args.name,
                     type: args.type,
                     users: { connect: { id: args.userId } },
                 },
+                include: { users: true, items: { include: { category: true, assignedTo: true } }, categories: true },
+            });
+        },
+
+        updateList: async (_: any, args: MutationUpdateListArgs) => {
+            const updateData = Object.fromEntries(Object.entries(args).filter(([_, value]) => value !== undefined && _ !== 'listId' && _ !== 'users'))
+            return prisma.list.update({
+                where: { id: args.listId },
+                data: updateData,
             });
         },
 

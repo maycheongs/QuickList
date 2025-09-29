@@ -25,6 +25,7 @@ type UpdateItemPayload {
 type Mutation {
     createUser(name: String!, email: String!): User!
     createList(name: String!, type: ListType!, userId: ID!): List!
+    updateList(listId: ID!, name: String, dueDate: String): List!
     deleteList(listId:ID!): List!
     addItemToList(listId: ID!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
     updateItem(ItemId: ID!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: String, recurrence: String, recurrenceEnd: String ): UpdateItemPayload!

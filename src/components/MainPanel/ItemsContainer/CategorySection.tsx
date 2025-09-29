@@ -12,6 +12,7 @@ type CategorySectionProps = {
     isLastMinute?: boolean;
     isChecked?: boolean;
     color: string;
+    categories: { id: string; name: string }[]
 };
 
 function CategorySection({ categoryKey, items, isChecked, isLastMinute, color, categories }: CategorySectionProps) {
@@ -21,6 +22,14 @@ function CategorySection({ categoryKey, items, isChecked, isLastMinute, color, c
     // console.log('ischecked', isChecked, 'items', items);
 
     const [categoryId, categoryName] = categoryKey ? categoryKey.split('_') : [null, null];
+
+    const optimisticDeleteCategoryIfEmpty = (listId: string, categoryId: string, itemId: string) => {
+        //check if any items are using this category
+        const stillInUse = items.some(item => item.category?.id === categoryId && item.id !== itemId);
+        if (!stillInUse) {
+            dispatch({ type: "DELETE_CATEGORY", payload: { listId, id: categoryId } })
+        }
+    }
 
 
     return (

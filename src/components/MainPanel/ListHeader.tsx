@@ -82,29 +82,67 @@ const ListHeader = ({ list }: ListHeaderProps) => {
         // console.log('new date', date);
         // updateList
     };
+
     // console.log('duedate', list.dueDate);
     const handleSetTitle = (newTitle: string) => {
-        setTitle(newTitle);
-        // updateList
+        if (!list || !list.id) return;
+        setIsEditing(false);
+        //if empty reset to previous name
+        if (!newTitle.trim()) {
+            setTitle(list?.name || '');
+            return;
+        }
+        //if no change, do nothing
+        if (newTitle.trim() === list?.name) {
+            return;
+        }
+        //if new name is a duplicate, append (1)
+        const existingNames = Object.values(state.lists).map(l => l.name);
+        if (existingNames.includes(newTitle.trim())) {
+            let baseName = newTitle.trim();
+            let name = baseName;
+            let counter = 1;
+            while (existingNames.includes(name)) {
+                name = `${baseName} (${counter})`;
+                counter++;
+            }
+            newTitle = name;
+        }
+        setTitle(newTitle.trim());
+        updateList(list.id, { name: newTitle.trim() });
     }
+
+
 
     return (
         <Box py={3} px={6} borderBottom="1px solid" borderColor="gray.200" position="sticky" top={0} bg="background" zIndex='docked' opacity='0.98'>
             <VStack gap={2} align="start">
 
                 <Editable.Root
-                    value={title} onValueChange={(e) => handleSetTitle(e.value)} placeholder="List Name"
+                    value={title}
+                    onValueChange={(e) => setTitle(e.value)}
+                    onKeyDown={(e: React.KeyboardEvent) => {
+                        if (e.key === 'Enter') {
+                            handleSetTitle(title);
+                        }
+                    }}
+                    onBlur={() => handleSetTitle(title)}
+                    onFocus={() => console.log('editable focus', title)}
+                    edit={isEditing}
+                    placeholder="List Name"
+
                 >
-                    <Editable.Preview fontSize='2xl' fontWeight={'bold'} />
+                    <Editable.Preview fontSize='2xl' fontWeight={'bold'} onClick={() => setIsEditing(true)} />
                     <Editable.Input fontSize='2xl' fontWeight={'bold'} />
                 </Editable.Root>
 
                 <DatePicker
-                    selected={dueDate}
+                    selected={listDueDate}
                     onChange={changeDueDate}
                     customInput={<CustomInput onClear={() => setDueDate(null)} />}
                     dateFormat="Pp"
                     showTimeSelect
+
                 />
 
             </VStack>

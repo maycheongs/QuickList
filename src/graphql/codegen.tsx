@@ -78,6 +78,7 @@ export type Mutation = {
   toggleReminders: List;
   updateCategory: Category;
   updateItem: UpdateItemPayload;
+  updateList: List;
 };
 
 
@@ -159,6 +160,13 @@ export type MutationUpdateItemArgs = {
   reminderAt?: InputMaybe<Scalars['String']['input']>;
 };
 
+
+export type MutationUpdateListArgs = {
+  dueDate?: InputMaybe<Scalars['String']['input']>;
+  listId: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   categories: Array<Category>;
@@ -212,6 +220,22 @@ export type CreateListMutationVariables = Exact<{
 
 
 export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type?: ListType | null, createdAt: string, dueDate?: string | null, remindersOn?: boolean | null, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } };
+
+export type DeleteListMutationVariables = Exact<{
+  listId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteListMutation = { __typename?: 'Mutation', deleteList: { __typename?: 'List', id: string } };
+
+export type UpdateListMutationVariables = Exact<{
+  listId: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateListMutation = { __typename?: 'Mutation', updateList: { __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn?: boolean | null } };
 
 export type AddItemToListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
@@ -320,6 +344,39 @@ export function useCreateListMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateListMutationHookResult = ReturnType<typeof useCreateListMutation>;
 export type CreateListMutationResult = Apollo.MutationResult<CreateListMutation>;
 export type CreateListMutationOptions = Apollo.BaseMutationOptions<CreateListMutation, CreateListMutationVariables>;
+export const DeleteListDocument = gql`
+    mutation DeleteList($listId: ID!) {
+  deleteList(listId: $listId) {
+    id
+  }
+}
+    `;
+export type DeleteListMutationFn = Apollo.MutationFunction<DeleteListMutation, DeleteListMutationVariables>;
+export function useDeleteListMutation(baseOptions?: Apollo.MutationHookOptions<DeleteListMutation, DeleteListMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteListMutation, DeleteListMutationVariables>(DeleteListDocument, options);
+      }
+export type DeleteListMutationHookResult = ReturnType<typeof useDeleteListMutation>;
+export type DeleteListMutationResult = Apollo.MutationResult<DeleteListMutation>;
+export type DeleteListMutationOptions = Apollo.BaseMutationOptions<DeleteListMutation, DeleteListMutationVariables>;
+export const UpdateListDocument = gql`
+    mutation UpdateList($listId: ID!, $name: String, $dueDate: String) {
+  updateList(listId: $listId, name: $name, dueDate: $dueDate) {
+    id
+    name
+    dueDate
+    remindersOn
+  }
+}
+    `;
+export type UpdateListMutationFn = Apollo.MutationFunction<UpdateListMutation, UpdateListMutationVariables>;
+export function useUpdateListMutation(baseOptions?: Apollo.MutationHookOptions<UpdateListMutation, UpdateListMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateListMutation, UpdateListMutationVariables>(UpdateListDocument, options);
+      }
+export type UpdateListMutationHookResult = ReturnType<typeof useUpdateListMutation>;
+export type UpdateListMutationResult = Apollo.MutationResult<UpdateListMutation>;
+export type UpdateListMutationOptions = Apollo.BaseMutationOptions<UpdateListMutation, UpdateListMutationVariables>;
 export const AddItemToListDocument = gql`
     mutation AddItemToList($listId: ID!, $name: String!, $lastMinute: Boolean, $isTask: Boolean, $categoryId: ID) {
   addItemToList(

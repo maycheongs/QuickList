@@ -34,7 +34,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
         categoryColorMap[cat.id] = categoryColors[idx % categoryColors.length];
     });
 
-    const { categorized, uncategorized, lastMinute, checked } = organizeItems(items);
+    const { categorized, uncategorized, lastMinute, checked } = organizeItems(items || []);
 
     function organizeItems(items: Item[]): OrganizedItems {
         const categorized: Record<string, Item[]> = {};
@@ -77,6 +77,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                             categoryKey={null}
                             items={uncategorized}
                             color='gray'
+                            categories={categories}
 
                         /> : ''}
 
@@ -87,6 +88,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                                 categoryKey={categoryKey}
                                 items={items}
                                 color={categoryColorMap[(categoryKey.split('_')[0])]}
+                                categories={categories}
                             />
                         )) : ''}
 
@@ -98,6 +100,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                             items={lastMinute}
                             isLastMinute={true}
                             color='gray'
+                            categories={categories}
                         /> : ''}
 
                     {/* Checked Items */}
@@ -106,11 +109,12 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                             items={checked}
                             isChecked={true}
                             color='gray'
+                            categories={categories}
                         />
                     ) : ''}
                 </VStack>
             </Box>
-            <AddItemBar categories={categories} />
+            <AddItemBar categories={categories} listId={list.id} />
         </Box>
     )
 }

@@ -33,6 +33,9 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
+    if (!listId) return null
+
+
 
     const handleMouseLeaveMenu = (event: React.MouseEvent) => {
         if (timerRef.current) clearTimeout(timerRef.current);
@@ -48,29 +51,30 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
 
     const handleDeleteItem = async () => {
         console.log('deleting item', item.name)
-        await deleteItem(item.id)
+        await deleteItem(listId, item.id)
     }
 
     const toggleCheck = (checked: boolean, itemId: Item['id']) => {
-        updateItem(itemId, { checked })
+        updateItem(listId, itemId, { checked })
     }
 
     const toggleLastMinute = (lastMinute: boolean, itemId: Item['id']) => {
-        updateItem(itemId, { lastMinute: !lastMinute })
+        updateItem(listId, itemId, { lastMinute: !lastMinute })
     }
 
     const onSetCategory = (category: Category | null, itemId: Item['id']) => {
         console.log('setting category', category)
-        updateItem(itemId, { category })
+        updateItem(listId, itemId, { category })
     }
 
     const createCategory = async (category: string) => {
-        if (!selectedListId) return
-        return await addCategory(category, selectedListId)
+        if (!listId) return
+        return await addCategory(category, listId)
     }
 
     const handleSubmitCategory = async (e: React.FormEvent) => {
         e.preventDefault()
+
         const category = newCategory.trim()
         if (category === item.category?.name) return //no change
         setOpen(false)
@@ -79,6 +83,9 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
         if (existingCategory) updateItem(listId, item.id, { category: existingCategory })
         else {
             const prevItem = { ...item }
+            //optimistically delete old category if there are no items using it
+            if (prevItem.category) optimisticDeleteCategoryIfEmpty(listId, prevItem.category.id, item.id)
+
             //optimically update item with new category
             dispatch({ type: "UPDATE_ITEM", payload: { listId, id: item.id, changes: { category: { id: `temp-${Date.now()}`, name: category } } } })
             //wait for the real category to create then actually update the item
@@ -113,7 +120,6 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
         const caretPos = e.currentTarget.selectionStart
         setNewCategory(prev => prev.slice(0, (caretPos || 1) - 1))
     }
-
 
 
 

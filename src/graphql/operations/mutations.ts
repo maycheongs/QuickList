@@ -20,6 +20,26 @@ export const CREATE_LIST = gql`
   }
 `;
 
+export const DELETE_LIST = gql`
+  mutation DeleteList($listId: ID!) {
+    deleteList(listId: $listId) {
+      id
+    }
+  }
+`;
+
+// Update list details
+export const UPDATE_LIST = gql`
+  mutation UpdateList($listId: ID!, $name: String, $dueDate: String) {
+    updateList(listId: $listId, name: $name, dueDate: $dueDate) {
+      id
+      name
+      dueDate
+      remindersOn
+    }
+  }
+`;
+
 // Add item to a list
 export const ADD_ITEM_TO_LIST = gql`
   mutation AddItemToList(

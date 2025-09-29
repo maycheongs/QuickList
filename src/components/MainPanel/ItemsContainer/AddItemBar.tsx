@@ -10,10 +10,11 @@ import { BiTrim } from 'react-icons/bi';
 
 interface AddItemBarProps {
     categories?: Category[],
+    listId?: string
 }
 
 
-function AddItemBar({ categories }: AddItemBarProps) {
+function AddItemBar({ categories, listId }: AddItemBarProps) {
 
     const addItem = useAddItem()
     const [itemName, setItemName] = useState('');
@@ -22,10 +23,10 @@ function AddItemBar({ categories }: AddItemBarProps) {
 
 
     async function handleAddItem(value: string) {
-        if (!selectedListId || !value.trim()) return
+        if (!listId || !value.trim()) return
         console.log('adding item', value)
         setItemName('')
-        addItem({ name: value }, selectedListId)
+        addItem(listId, { name: value })
 
     }
 
