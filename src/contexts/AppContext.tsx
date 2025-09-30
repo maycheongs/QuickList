@@ -4,8 +4,8 @@
 import { createContext, useReducer, useContext, ReactNode, useEffect } from "react";
 import { appDataReducer } from "./AppReducer";
 import type { AppAction, AppState, ListsMap, List } from "./types";
-import { ListType, useListsByUserQuery } from "@/graphql/codegen";
-import { useCreateListMutation } from "@/graphql/codegen";
+import { useListsByUserQuery } from "@/graphql/codegen";
+import { useBreakpointValue } from "@chakra-ui/react";
 
 //test user
 export const seedUser = { name: "Alice", email: "alice@example.com", id: "test-id" }
@@ -15,7 +15,8 @@ type AppDataContextType = {
     dispatch: React.Dispatch<AppAction>;
     loading: boolean;
     error?: Error;
-    setSelectedList: (id: string) => void;
+    setSelectedList: (id: string | null) => void;
+    isMobile: boolean
 };
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -27,6 +28,7 @@ export function AppDataProvider({
 }: {
     children: ReactNode;
 }) {
+    const isMobile = useBreakpointValue({ base: true, md: false })
     const { data, loading, error } = useListsByUserQuery({ variables: { userId: seedUser.id } }) //get initial state from ListContext
     const [state, dispatch] = useReducer(appDataReducer, { lists: {}, selectedListId: null });
     // const [createList] = useCreateListMutation()
@@ -52,18 +54,19 @@ export function AppDataProvider({
         if (saved && saved in initialMap) {
             dispatch({ type: 'SET_SELECTED_LIST', payload: saved });
         } else {
-            dispatch({ type: 'SET_SELECTED_LIST', payload: data.user.lists[0].id });
+            if (!isMobile) dispatch({ type: 'SET_SELECTED_LIST', payload: data.user.lists[0].id });
         }
     }, [data?.user?.id]);
 
     // Helper to set selected list and persist to localStorage
-    const setSelectedList = (id: string) => {
+    const setSelectedList = (id: string | null) => {
         dispatch({ type: 'SET_SELECTED_LIST', payload: id });
-        localStorage.setItem(`selectedListId:${seedUser.id}`, id);
+        if (id) localStorage.setItem(`selectedListId:${seedUser.id}`, id)
+        else localStorage.removeItem(`selectedListId:${seedUser.id}`)
     };
 
     return (
-        <AppDataContext.Provider value={{ state, dispatch, loading, error, setSelectedList }
+        <AppDataContext.Provider value={{ state, dispatch, loading, error, setSelectedList, isMobile: !!isMobile }
         }>
             {children}
         </AppDataContext.Provider>

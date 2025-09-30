@@ -1,6 +1,6 @@
 //components/MainPanel/ItemsContainer/CategorySection.tsx
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, VStack, HStack, Badge, Separator, Collapsible, Editable } from '@chakra-ui/react';
 import { ChevronDown, Pencil } from 'lucide-react';
 import ListItem from './ListItem'
@@ -25,10 +25,17 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
     const updateCategory = useUpdateCategory()
     const [open, setOpen] = useState(true)
 
-    // console.log('ischecked', isChecked, 'items', items);
-
     const categoryName = categories.find(c => c.id === categoryId)?.name || null
     const [editable, setEditable] = useState(categoryName || '')
+
+    useEffect(() => {
+        if (!categories.length) return
+        const category = categories.find(c => c.id === categoryId)
+        category && setEditable(category.name)
+
+    }, [categoryId])
+
+
 
     const optimisticDeleteCategoryIfEmpty = (listId: string, categoryId: string, itemId: string) => {
         //check if any items are using this category

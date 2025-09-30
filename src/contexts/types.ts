@@ -39,7 +39,7 @@ export type AppState = {
 
 export type AppAction =
     | { type: 'SET_ALL_LISTS'; payload: ListsMap }
-    | { type: 'SET_SELECTED_LIST'; payload: string }
+    | { type: 'SET_SELECTED_LIST'; payload: string | null }
     | { type: 'UPDATE_LIST'; payload: { listId: List['id']; changes: Partial<List> } }
     | { type: 'ADD_ITEM'; payload: { listId: List['id'] | string; item: ListItem } }
     | { type: "UPDATE_ITEM"; payload: { listId: List['id'], id: ListItem['id']; changes: Partial<ListItem> } }

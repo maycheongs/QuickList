@@ -60,7 +60,7 @@ const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
 
 const ListHeader = ({ list }: ListHeaderProps) => {
     const updateList = useUpdateList()
-    const { state } = useAppData();
+    const { state, isMobile } = useAppData();
     const [title, setTitle] = useState(list?.name || '');
     const [isEditing, setIsEditing] = useState(list?.isNew || false);
     console.log('duedate', list?.dueDate)
@@ -145,6 +145,7 @@ const ListHeader = ({ list }: ListHeaderProps) => {
                     customInput={<CustomInput onClear={() => setDueDate(null)} />}
                     dateFormat="Pp"
                     showTimeSelect
+                    popperPlacement={'bottom-start'}
 
                 />
 

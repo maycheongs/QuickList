@@ -56,10 +56,10 @@ function AddItemBar({ categories, listId }: AddItemBarProps) {
                 borderColor='gray.200'
             >
                 <HStack gap={3}>
-                    <Editable.Root submitMode='none' value={itemName} onValueChange={(e) => setItemName(e.value)} placeholder="Add Item" onKeyDown={(e) => handleHitEnter(e)}
+                    <Editable.Root submitMode='none' value={itemName} onValueChange={(e) => setItemName(e.value)} placeholder="Add a new item to the list" onKeyDown={(e) => handleHitEnter(e)}
                         onInteractOutside={(e) => e.preventDefault()}
                     >
-                        <Editable.Preview />
+                        <Editable.Preview width="full" />
                         <Editable.Input />
                     </Editable.Root>
 

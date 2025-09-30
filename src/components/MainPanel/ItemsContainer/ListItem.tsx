@@ -22,7 +22,7 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
     const deleteItem = useDeleteItem()
     const updateItem = useUpdateItem()
     const addCategory = useAddCategory()
-    const { state, dispatch } = useAppData()
+    const { state, dispatch, isMobile } = useAppData()
     const { selectedListId: listId } = state
 
     const [open, setOpen] = useState(false);
@@ -136,7 +136,7 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
             bg={(item.lastMinute && !item.checked) ? "yellow.50" : "inherit"}
             opacity={item.checked ? 0.6 : 1}
         >
-            <HStack gap={3}>
+            <HStack gap={2}>
                 <Checkbox.Root
                     checked={item.checked}
                     onCheckedChange={(details) => toggleCheck(details.checked === true, item.id)}
@@ -158,15 +158,11 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
                 <Menu.Root open={open} onOpenChange={e => setOpen(e.open)} onHighlightChange={({ highlightedValue }) => { if (highlightedValue && categories.map(c => c.name).includes(highlightedValue)) setNewCategory(highlightedValue) }}>
 
                     <Menu.Trigger asChild ref={triggerRef} onMouseLeave={handleMouseLeaveMenu} >
-                        {/* <IconButton variant="ghost" size="xs" _hover={{ bg: 'transparent' }} _expanded={{ bg: 'transparent' }}>
-                                <Icon ><Settings /></Icon>
-                            </IconButton> */}
-                        {/* <Tooltip content="Add/Change Category"> */}
                         <Badge colorPalette={item.color} variant="subtle" >
                             {item.category ? item.category.name : 'Category'}
                         </Badge>
-                        {/* </Tooltip> */}
                     </Menu.Trigger>
+
                     <Menu.Positioner>
                         <Menu.Content ref={menuRef} onMouseLeave={handleMouseLeaveMenu}>
                             <Menu.Item disabled value='set-category'>
@@ -202,27 +198,29 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
                             </Menu.Item>
                         </Menu.Content>
                     </Menu.Positioner>
-
                 </Menu.Root>
-                <HStack gap={1} opacity={0} _groupHover={{ opacity: 1 }}>
-                    <Tooltip content={!item.lastMinute ? "Mark as last minute" : "Unmark last minute"} >
+                <HStack gap={1} opacity={isMobile ? 1 : 0} _groupHover={{ opacity: 1 }}>
 
+                    {/** LAST MINUTE TOGGLE */}
+                    <Tooltip content={!item.lastMinute ? "Mark as last minute" : "Unmark last minute"} >
                         <Button
                             size="xs"
                             variant="ghost"
                             onClick={() => toggleLastMinute(item.lastMinute, item.id)}
                             _hover={{ bg: 'transparent' }}
+                            p={0}
                         >
                             <Icon fill={item.lastMinute ? 'inherit' : 'none'}><Zap /></Icon>
                         </Button>
-
                     </Tooltip>
 
+                    {/** DELETE ITEM */}
                     <Tooltip content="Delete Item">
                         <IconButton size="xs"
                             variant="ghost"
                             _hover={{ bg: 'transparent' }}
                             onClick={handleDeleteItem}
+                            p={0}
                         >
                             <Trash />
                         </IconButton>

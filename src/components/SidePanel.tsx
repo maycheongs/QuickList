@@ -2,19 +2,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { VStack, Heading, Box, HStack, Separator, Button, Text, IconButton, Menu, Portal } from '@chakra-ui/react';
-import { ListPlus } from 'lucide-react'
+import { VStack, Heading, Box, HStack, Separator, Spacer, IconButton, Menu, Portal } from '@chakra-ui/react';
+import { ListPlus, Trash2 } from 'lucide-react'
 import { useAppData } from '@/contexts/AppContext';
 import { useAddList, useDeleteList } from '@/contexts/AppDataOperations';
 
 interface SidePanelProps {
-    lists: { id: string; name: string; dueDate?: string | null }[];
+    lists: { id: string; name: string; dueDate?: Date | null }[];
     selectedListId: string | null;
 }
 
 
 export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
-    const { state, error, loading, setSelectedList } = useAppData();
+    const { state, error, loading, setSelectedList, isMobile } = useAppData();
     const [addDisabled, setAddDisabled] = useState(false)
     //right-click menu
     const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
@@ -67,7 +67,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
         const rect = e.currentTarget.getBoundingClientRect();
 
         // Calculate the center of the element
-        const centerX = rect.left + rect.width / 2;
+        const centerX = isMobile ? rect.left - 80 : rect.left + rect.width / 2;
         const centerY = rect.top + 5;
         setMenuPosition({ x: centerX, y: centerY });
         setMenuListId(listId);
@@ -86,39 +86,50 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
     return (
         <VStack as="nav" gap={1} align="stretch" p={4} height='100%' overflowY="auto" fontSize={'sm'} minWidth={150}>
             <HStack gap={2} justify='space-between' pr={3} pb={2}>
-                <Heading size="lg">My Lists</Heading>
-                <IconButton disabled={addDisabled} display={{ base: "none", sm: "block" }} variant='ghost' aria-label="add-list" onClick={onAddList}><ListPlus /></IconButton>
+                <Heading size="lg" ml={2}>My Lists</Heading>
+                {<IconButton disabled={addDisabled} variant='ghost' aria-label="add-list" onClick={onAddList}><ListPlus /></IconButton>}
             </HStack>
-            <Box mt={2} display={{ base: "block", sm: "none" }}>
-                <Separator />
-                <Box px={2} py={2}><HStack justify='space-between'><Text fontWeight='semibold'>Add Item</Text> <ListPlus /></HStack></Box>
-                <Separator />
-            </Box>
+
+            {isMobile ? <Separator /> : ''}
+
             {lists.map((list) => (
-                <Box
-                    key={list.id}
-                    p={2}
-                    pl={3}
-                    borderRadius="md"
-                    cursor="pointer"
-                    data-selected={selectedListId === list.id ? "" : undefined}
-                    _selected={{
-                        bg: "blue.50",
-                        color: "blue.700",
-                        fontWeight: "semibold",
-                        _hover: {
+                <HStack align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
+                    <Box
+                        key={list.id}
+                        p={2}
+                        pl={3}
+                        borderRadius="md"
+                        cursor="pointer"
+                        data-selected={selectedListId === list.id ? "" : undefined}
+                        _selected={{
                             bg: "blue.50",
-                        },
-                    }}
-                    onClick={() => setSelectedList(list.id)}
-                    onContextMenu={(e) => handleRightclick(e, list.id)}
-                    _hover={{
-                        bg: "gray.100"
-                    }}
-                >
-                    {list.name}
-                </Box>
+                            color: "blue.700",
+                            fontWeight: "semibold",
+                            _hover: {
+                                bg: "blue.50",
+                            },
+                        }}
+
+                        _hover={{
+                            bg: "gray.100"
+                        }}
+
+                    >
+
+                        {list.name}
+                    </Box>
+                    <Spacer />
+
+                    {isMobile ? <IconButton onClick={(e) => { e.stopPropagation(); handleRightclick(e, list.id) }} variant='ghost' size='xs' opacity={0.5} pt={2}><Trash2 /></IconButton> : ''}
+                </HStack>
+
             ))}
+            {/* {isMobile ?
+                <Box mt={2} >
+                    <Separator />
+                    <Box px={2} py={2} onClick={onAddList}><HStack justify='space-between'><Text fontWeight='semibold'>Add List</Text> <ListPlus /></HStack></Box>
+                    <Separator />
+                </Box> : ''} */}
 
             {menuPosition && menuListId && (
 
