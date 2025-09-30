@@ -98,7 +98,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
 
             {lists.map((list) => (
                 <>
-                    <HStack key={list.id} align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
+                    <HStack key={list.id} justify="space-between" align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
                         <Box
                             flex={1}
                             p={2}
@@ -126,7 +126,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
 
                         {isMobile ?
                             <>
-                                <Spacer />
+                                {/* <Spacer /> */}
                                 <IconButton onClick={(e) => { e.stopPropagation(); handleRightclick(e, list.id) }} variant='ghost' size='xs' opacity={0.5} pt={2}><Trash2 /></IconButton>
 
                             </>
