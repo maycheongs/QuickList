@@ -158,7 +158,10 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
                 <Menu.Root open={open} onOpenChange={e => setOpen(e.open)} onHighlightChange={({ highlightedValue }) => { if (highlightedValue && categories.map(c => c.name).includes(highlightedValue)) setNewCategory(highlightedValue) }}>
 
                     <Menu.Trigger asChild ref={triggerRef} onMouseLeave={handleMouseLeaveMenu} >
-                        <Badge colorPalette={item.color} variant="subtle" >
+                        <Badge colorPalette={item.color} variant="subtle"
+                            maxW={isMobile ? "70px" : "150px"} overflow="hidden" textOverflow="ellipsis"
+                            display="inline-block"
+                        >
                             {item.category ? item.category.name : 'Category'}
                         </Badge>
                     </Menu.Trigger>

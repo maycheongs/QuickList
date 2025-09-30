@@ -11,6 +11,8 @@ import { useAppData } from '@/contexts/AppContext';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
+const MAX_LENGTH = 80 // MAX LENGTH OF A TITLE
+
 interface ListHeaderProps {
     list: Partial<OptimisticList> | null;
 }
@@ -119,7 +121,19 @@ const ListHeader = ({ list }: ListHeaderProps) => {
         updateList(list.id, { name: newTitle.trim() });
     }
 
-    console.log('listduedate', listDueDate)
+    const handleValueChange = (value: string) => {
+
+        if (value.length <= MAX_LENGTH) {
+            setTitle(value)
+        }
+    }
+
+    const handleValuePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault(); // prevent default paste
+        const paste = e.clipboardData.getData('text');
+        const allowedPaste = paste.slice(0, MAX_LENGTH - title.length); // only allow up to max
+        handleValueChange(title + allowedPaste)
+    }
 
 
 
@@ -129,7 +143,7 @@ const ListHeader = ({ list }: ListHeaderProps) => {
 
                 <Editable.Root
                     value={title}
-                    onValueChange={(e) => setTitle(e.value)}
+                    onValueChange={(e) => handleValueChange(e.value)}
                     onKeyDown={(e: React.KeyboardEvent) => {
                         if (e.key === 'Enter') {
                             handleSetTitle(title);
@@ -142,7 +156,7 @@ const ListHeader = ({ list }: ListHeaderProps) => {
 
                 >
                     <Editable.Preview fontSize='2xl' fontWeight={'bold'} onClick={() => setIsEditing(true)} />
-                    <Editable.Input fontSize='2xl' fontWeight={'bold'} />
+                    <Editable.Input fontSize='2xl' fontWeight={'bold'} value={title} onPaste={(e) => handleValuePaste(e)} />
                 </Editable.Root>
 
                 <DatePicker

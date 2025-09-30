@@ -1,8 +1,8 @@
 //components/MainPanel/ItemsContainer/CategorySection.tsx
 'use client';
 import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Badge, Separator, Collapsible, Editable } from '@chakra-ui/react';
-import { ChevronDown, Pencil } from 'lucide-react';
+import { Box, VStack, HStack, Badge, Separator, Collapsible, Editable, IconButton, Spacer } from '@chakra-ui/react';
+import { ChevronDown, PencilLine, Check, X } from 'lucide-react';
 import ListItem from './ListItem'
 import { Item } from '.';
 import { useAppData } from '@/contexts/AppContext';
@@ -21,7 +21,7 @@ type CategorySectionProps = {
 
 function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, color, categories }: CategorySectionProps) {
 
-    const { dispatch } = useAppData();
+    const { dispatch, isMobile } = useAppData();
     const updateCategory = useUpdateCategory()
     const [open, setOpen] = useState(true)
 
@@ -83,7 +83,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                         <HStack mb={2} onClick={(e) => {
                             // Only toggle if not clicking on the editable area
                             const target = e.target as HTMLElement;
-                            if (!target.closest('[data-scope="editable"]')) {
+                            if (!isMobile && !target.closest('[data-scope="editable"]')) {
                                 setOpen(!open);
                             }
                         }}
@@ -99,13 +99,15 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                     flexShrink={0}
                                 />
                             </Collapsible.Trigger>
-                            <HStack gap={1} alignItems='center'>
+                            <HStack gap={1} alignItems='center' w={isMobile ? "90%" : "auto"} onClick={() => {
+                                if (isMobile) setOpen(!open); // toggle collapsible on mobile
+                            }}>
 
                                 {categoryName ?
                                     <Editable.Root
                                         value={editable}
                                         onValueChange={(e) => setEditable(e.value)}
-                                        activationMode="dblclick"
+                                        activationMode={isMobile ? "none" : "dblclick"}
                                         onValueCommit={(e) => onCategoryChange(e.value)}
                                         disabled={categoryId!.startsWith('temp')}
                                     >
@@ -116,7 +118,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                             borderLeftColor={`${color}.400`}
                                             pl={2}
                                             whiteSpace="nowrap"
-                                            display="inline-flex"
+                                            display="block"
                                             alignItems="center"
                                             gap={1.5}
                                             _hover={{
@@ -124,6 +126,11 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                                     opacity: 1,
                                                 },
                                             }}
+                                            maxW="55vw"
+                                            textOverflow="ellipsis"
+                                            overflow="hidden"
+
+                                        // pointerEvents={isMobile ? "none" : "auto"}
                                         >
                                             {editable.toUpperCase()}
 
@@ -141,6 +148,23 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                                 borderBottomColor: 'blue.500',
                                             }}
                                         />
+                                        {isMobile ? <Editable.Control>
+                                            <Editable.EditTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                <IconButton variant="ghost" size="xs">
+                                                    <PencilLine />
+                                                </IconButton>
+                                            </Editable.EditTrigger>
+                                            <Editable.CancelTrigger asChild>
+                                                <IconButton variant="outline" size="xs" onClick={(e) => e.stopPropagation()}>
+                                                    <X />
+                                                </IconButton>
+                                            </Editable.CancelTrigger>
+                                            <Editable.SubmitTrigger asChild>
+                                                <IconButton variant="outline" size="xs" onClick={(e) => e.stopPropagation()}>
+                                                    <Check />
+                                                </IconButton>
+                                            </Editable.SubmitTrigger>
+                                        </Editable.Control> : ''}
                                     </Editable.Root> :
 
                                     <Box
@@ -153,9 +177,12 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                     </Box>
 
                                 }
+                                <Spacer />
                                 <Badge size='sm' fontWeight='500' fontSize={11} color='inherit'>
                                     {`${items.length} items`}
                                 </Badge>
+
+
                             </HStack>
 
                         </HStack><Separator mb={1} />

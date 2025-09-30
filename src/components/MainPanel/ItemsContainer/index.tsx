@@ -4,6 +4,7 @@ import { GetListQuery } from '@/graphql/codegen';
 import { Box, VStack } from '@chakra-ui/react';
 import CategorySection from './CategorySection';
 import AddItemBar from './AddItemBar';
+import { useAppData } from '@/contexts/AppContext';
 
 
 export type Item = NonNullable<GetListQuery['list']>['items'][0] & { color?: string; };
@@ -27,6 +28,7 @@ interface ItemsContainerProps {
 const ItemsContainer = ({ list }: ItemsContainerProps) => {
 
     const { items, categories } = list
+    const { isMobile } = useAppData()
 
 
     const categoryColorMap: Record<Category['id'], string> = {};
@@ -69,7 +71,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
         return { categorized, uncategorized, lastMinute, checked };
     };
     return (
-        <Box as="section" flex={1} py={2} px={5} position="relative" overflow="hidden">
+        <Box as="section" flex={1} py={2} px={5} pr={isMobile ? 1 : 5} position="relative" overflow="hidden">
             <Box overflowY="auto" height="100%" pb={16}>
                 <VStack gap={0} align="stretch">
                     {/* Uncategorized */}
