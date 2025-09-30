@@ -13,7 +13,7 @@ type ResolverContext = { req: NextRequest; prisma: ReturnType<typeof getPrismaCl
 
 const prisma = getPrismaClient();
 
-export const resolvers = {
+const resolvers = {
     DateTime: GraphQLDateTime,
     Query: {
         users: async () => {
