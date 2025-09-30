@@ -2,6 +2,7 @@ import { gql } from 'graphql-tag'
 
 export const typeDefs = gql`
 scalar ID
+scalar DateTime
 
 type Query {
     users: [User!]!
@@ -25,10 +26,10 @@ type UpdateItemPayload {
 type Mutation {
     createUser(name: String!, email: String!): User!
     createList(name: String!, type: ListType!, userId: ID!): List!
-    updateList(listId: ID!, name: String, dueDate: String): List!
+    updateList(listId: ID!, name: String, dueDate: DateTime): List!
     deleteList(listId:ID!): List!
-    addItemToList(listId: ID!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: String, recurrence: String, recurrenceEnd: String): Item!
-    updateItem(ItemId: ID!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: String, recurrence: String, recurrenceEnd: String ): UpdateItemPayload!
+    addItemToList(listId: ID!, name: String!, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: DateTime, recurrence: String, recurrenceEnd: DateTime): Item!
+    updateItem(ItemId: ID!, checked: Boolean, name: String, lastMinute: Boolean, isTask: Boolean, categoryId: ID, assignedToId: ID, reminderAt: DateTime, recurrence: String, recurrenceEnd:DateTime ): UpdateItemPayload!
     deleteItem(itemId: ID!): DeleteItemResult!
     addUser(listId: ID!, userId: ID!): List!
     duplicateList(listId: ID!): List!
@@ -52,8 +53,8 @@ type List {
     items: [Item!]!
     categories: [Category!]!
     users: [User!]!
-    createdAt: String!
-    dueDate: String
+    createdAt: DateTime!
+    dueDate: DateTime
     remindersOn: Boolean
   }
 
@@ -66,10 +67,10 @@ type List {
     category: Category
     assignedTo: User
     isTask: Boolean
-    reminderAt: String
+    reminderAt: DateTime
     recurrence: String
-    recurrenceEnd: String
-    createdAt: String!
+    recurrenceEnd: DateTime
+    createdAt: DateTime!
   } 
 
  type Category {

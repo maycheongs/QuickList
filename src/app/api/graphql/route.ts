@@ -1,5 +1,6 @@
 //src/app/api/graphql/route.ts
 import { ApolloServer } from "@apollo/server";
+import { GraphQLDateTime } from 'graphql-scalars';
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { getPrismaClient } from "@/lib/prisma";
 import { typeDefs } from "./typeDefs";
@@ -10,6 +11,7 @@ import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdate
 const prisma = getPrismaClient();
 
 export const resolvers = {
+    DateTime: GraphQLDateTime,
     Query: {
         users: async () => {
             return prisma.user.findMany({

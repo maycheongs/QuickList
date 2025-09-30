@@ -23,7 +23,7 @@ export type ListCategory = {
 export type ListDataState = {
     id: List['id'];
     name: string;
-    dueDate?: string | null | undefined;
+    dueDate?: Date | null;
     items: ListItem[];
     categories: ListCategory[];
     isNew?: true;

@@ -63,7 +63,8 @@ const ListHeader = ({ list }: ListHeaderProps) => {
     const { state } = useAppData();
     const [title, setTitle] = useState(list?.name || '');
     const [isEditing, setIsEditing] = useState(list?.isNew || false);
-    const [listDueDate, setDueDate] = useState<Date | null>(list?.dueDate ? (new Date(Number(list.dueDate)) || null) : null);
+    console.log('duedate', list?.dueDate)
+    const [listDueDate, setDueDate] = useState<Date | null>(list?.dueDate ? new Date(list.dueDate) : null);
 
     useEffect(() => {
 
@@ -78,9 +79,9 @@ const ListHeader = ({ list }: ListHeaderProps) => {
 
 
     const changeDueDate = (date: Date | null) => {
+        if (!list?.id) return
         setDueDate(date);
-        // console.log('new date', date);
-        // updateList
+        updateList(list.id, { dueDate: date || null })
     };
 
     // console.log('duedate', list.dueDate);
@@ -111,6 +112,8 @@ const ListHeader = ({ list }: ListHeaderProps) => {
         setTitle(newTitle.trim());
         updateList(list.id, { name: newTitle.trim() });
     }
+
+    console.log('listduedate', listDueDate)
 
 
 

@@ -15,6 +15,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTime: { input: Date; output: Date; }
 };
 
 export type Category = {
@@ -36,22 +37,22 @@ export type Item = {
   assignedTo?: Maybe<User>;
   category?: Maybe<Category>;
   checked: Scalars['Boolean']['output'];
-  createdAt: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   isTask?: Maybe<Scalars['Boolean']['output']>;
   lastMinute: Scalars['Boolean']['output'];
   list: List;
   name: Scalars['String']['output'];
   recurrence?: Maybe<Scalars['String']['output']>;
-  recurrenceEnd?: Maybe<Scalars['String']['output']>;
-  reminderAt?: Maybe<Scalars['String']['output']>;
+  recurrenceEnd?: Maybe<Scalars['DateTime']['output']>;
+  reminderAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type List = {
   __typename?: 'List';
   categories: Array<Category>;
-  createdAt: Scalars['String']['output'];
-  dueDate?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  dueDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
   items: Array<Item>;
   name: Scalars['String']['output'];
@@ -90,8 +91,8 @@ export type MutationAddItemToListArgs = {
   listId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   recurrence?: InputMaybe<Scalars['String']['input']>;
-  recurrenceEnd?: InputMaybe<Scalars['String']['input']>;
-  reminderAt?: InputMaybe<Scalars['String']['input']>;
+  recurrenceEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  reminderAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -156,13 +157,13 @@ export type MutationUpdateItemArgs = {
   lastMinute?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   recurrence?: InputMaybe<Scalars['String']['input']>;
-  recurrenceEnd?: InputMaybe<Scalars['String']['input']>;
-  reminderAt?: InputMaybe<Scalars['String']['input']>;
+  recurrenceEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  reminderAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
 export type MutationUpdateListArgs = {
-  dueDate?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
   listId: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -219,7 +220,7 @@ export type CreateListMutationVariables = Exact<{
 }>;
 
 
-export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type?: ListType | null, createdAt: string, dueDate?: string | null, remindersOn?: boolean | null, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } };
+export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string, name: string, type?: ListType | null, createdAt: Date, dueDate?: Date | null, remindersOn?: boolean | null, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } };
 
 export type DeleteListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
@@ -231,11 +232,11 @@ export type DeleteListMutation = { __typename?: 'Mutation', deleteList: { __type
 export type UpdateListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
-  dueDate?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
 }>;
 
 
-export type UpdateListMutation = { __typename?: 'Mutation', updateList: { __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn?: boolean | null } };
+export type UpdateListMutation = { __typename?: 'Mutation', updateList: { __typename?: 'List', id: string, name: string, dueDate?: Date | null, remindersOn?: boolean | null } };
 
 export type AddItemToListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
@@ -309,14 +310,14 @@ export type ListsByUserQueryVariables = Exact<{
 }>;
 
 
-export type ListsByUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, lists: Array<{ __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn?: boolean | null, createdAt: string, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, createdAt: string, assignedTo?: { __typename?: 'User', id: string, name: string, email: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> }> } | null };
+export type ListsByUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name: string, lists: Array<{ __typename?: 'List', id: string, name: string, dueDate?: Date | null, remindersOn?: boolean | null, createdAt: Date, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, createdAt: Date, assignedTo?: { __typename?: 'User', id: string, name: string, email: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> }> } | null };
 
 export type GetListQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetListQuery = { __typename?: 'Query', list?: { __typename?: 'List', id: string, name: string, dueDate?: string | null, remindersOn?: boolean | null, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, assignedTo?: { __typename?: 'User', id: string, email: string, name: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } | null };
+export type GetListQuery = { __typename?: 'Query', list?: { __typename?: 'List', id: string, name: string, dueDate?: Date | null, remindersOn?: boolean | null, categories: Array<{ __typename?: 'Category', id: string, name: string }>, items: Array<{ __typename?: 'Item', id: string, name: string, checked: boolean, lastMinute: boolean, assignedTo?: { __typename?: 'User', id: string, email: string, name: string } | null, category?: { __typename?: 'Category', id: string, name: string } | null }>, users: Array<{ __typename?: 'User', id: string, name: string, email: string }> } | null };
 
 
 export const CreateListDocument = gql`
@@ -360,7 +361,7 @@ export type DeleteListMutationHookResult = ReturnType<typeof useDeleteListMutati
 export type DeleteListMutationResult = Apollo.MutationResult<DeleteListMutation>;
 export type DeleteListMutationOptions = Apollo.BaseMutationOptions<DeleteListMutation, DeleteListMutationVariables>;
 export const UpdateListDocument = gql`
-    mutation UpdateList($listId: ID!, $name: String, $dueDate: String) {
+    mutation UpdateList($listId: ID!, $name: String, $dueDate: DateTime) {
   updateList(listId: $listId, name: $name, dueDate: $dueDate) {
     id
     name

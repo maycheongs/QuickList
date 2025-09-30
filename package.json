@@ -22,6 +22,7 @@
     "@prisma/client": "^6.14.0",
     "framer-motion": "^12.23.12",
     "graphql": "^16.11.0",
+    "graphql-scalars": "^1.24.2",
     "graphql-tag": "^2.12.6",
     "lucide-react": "^0.542.0",
     "next": "15.4.6",

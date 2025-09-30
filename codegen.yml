@@ -10,6 +10,7 @@ generates:
       withHooks: true      # generate React hooks
       scalars:
         ID: string
+        DateTime: Date
       withHOC: false         # don't generate HOCs
       withComponent: false   # don't generate <Component> wrappers
       addDocBlocks: false    # don't generate big JSDoc comments

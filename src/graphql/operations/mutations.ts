@@ -30,7 +30,7 @@ export const DELETE_LIST = gql`
 
 // Update list details
 export const UPDATE_LIST = gql`
-  mutation UpdateList($listId: ID!, $name: String, $dueDate: String) {
+  mutation UpdateList($listId: ID!, $name: String, $dueDate: DateTime) {
     updateList(listId: $listId, name: $name, dueDate: $dueDate) {
       id
       name
