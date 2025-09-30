@@ -22,48 +22,47 @@ interface CustomInputProps {
 }
 
 
-const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
-    ({ value, onClick, onClear }, ref) => {
-        if (!value) {
-            // No date yet → show icon with tooltip
-            return (
-                <Tooltip content="Set a due date & time" showArrow>
-                    <IconButton
-                        aria-label="Select date"
-                        onClick={onClick}
-                        ref={ref}
-                        variant="outline"
-                        size="sm"
-                    > <CalendarDays />
-                    </IconButton>
-                </Tooltip>
-            );
-        }
-
-        // Date selected → show inline text
+const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(function CustomInput({ value, onClick, onClear }, ref) {
+    if (!value) {
+        // No date yet → show icon with tooltip
         return (
-            <HStack gap={1}>
-                <Text
-                    onClick={onClick}
-                    ref={ref as React.Ref<HTMLParagraphElement>}
-                    cursor="pointer"
-                    _hover={{ textDecoration: "underline" }}
-                    color='gray.600'
-                >
-                    <span style={{ display: "inline-flex", verticalAlign: "bottom" }}><CalendarDays /></span> Due: {value}
-                </Text>
+            <Tooltip content="Set a due date & time" showArrow>
                 <IconButton
-                    aria-label="Clear date"
-                    size="xs"
-                    variant="ghost"
-                    onClick={(e) => {
-                        e.stopPropagation(); // prevent opening datepicker
-                        onClear();
-                    }}
-                ><span>x</span></IconButton>
-            </HStack>
+                    aria-label="Select date"
+                    onClick={onClick}
+                    ref={ref}
+                    variant="outline"
+                    size="sm"
+                > <CalendarDays />
+                </IconButton>
+            </Tooltip>
         );
-    });
+    }
+
+    // Date selected → show inline text
+    return (
+        <HStack gap={1}>
+            <Text
+                onClick={onClick}
+                ref={ref as React.Ref<HTMLParagraphElement>}
+                cursor="pointer"
+                _hover={{ textDecoration: "underline" }}
+                color='gray.600'
+            >
+                <span style={{ display: "inline-flex", verticalAlign: "bottom" }}><CalendarDays /></span> Due: {value}
+            </Text>
+            <IconButton
+                aria-label="Clear date"
+                size="xs"
+                variant="ghost"
+                onClick={(e) => {
+                    e.stopPropagation(); // prevent opening datepicker
+                    onClear();
+                }}
+            ><span>x</span></IconButton>
+        </HStack>
+    );
+});
 
 const ListHeader = ({ list }: ListHeaderProps) => {
     const updateList = useUpdateList()
