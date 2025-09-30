@@ -9,7 +9,8 @@ import { QueryUserArgs, QueryListArgs, MutationAddItemToListArgs, MutationUpdate
 
 // Define resolver parent/context types
 type ResolverParent = unknown;
-type ResolverContext = { req: NextRequest; prisma: ReturnType<typeof getPrismaClient> };
+// type ResolverContext = { req: NextRequest; prisma: ReturnType<typeof getPrismaClient> };
+
 
 const prisma = getPrismaClient();
 
@@ -271,7 +272,7 @@ const resolvers = {
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
-const handler = startServerAndCreateNextHandler<NextRequest>(server, {
+const handler = startServerAndCreateNextHandler(server, {
     context: async (req) => ({ req, prisma }),
 });
 
