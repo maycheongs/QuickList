@@ -90,41 +90,53 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
     return (
         <VStack as="nav" gap={1} align="stretch" p={4} height='100%' overflowY="auto" fontSize={'sm'} minWidth={150}>
             <HStack gap={2} justify='space-between' pr={3} pb={2}>
-                <Heading size="lg" ml={2}>My Lists</Heading>
-                {<IconButton disabled={addDisabled} variant='ghost' aria-label="add-list" onClick={onAddList}><ListPlus /></IconButton>}
+                <Heading size={isMobile ? "2xl" : "lg"} ml={2}>My Lists</Heading>
+                {<IconButton size={isMobile ? "2xl" : "lg"} disabled={addDisabled} variant='ghost' aria-label="add-list" onClick={onAddList}><ListPlus /></IconButton>}
             </HStack>
 
             {isMobile ? <Separator /> : ''}
 
             {lists.map((list) => (
-                <HStack key={list.id} align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
-                    <Box
-                        p={2}
-                        pl={3}
-                        borderRadius="md"
-                        cursor="pointer"
-                        data-selected={selectedListId === list.id ? "" : undefined}
-                        _selected={{
-                            bg: "blue.50",
-                            color: "blue.700",
-                            fontWeight: "semibold",
-                            _hover: {
+                <>
+                    <HStack key={list.id} align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
+                        <Box
+                            flex={1}
+                            p={2}
+                            pl={3}
+                            borderRadius="md"
+                            cursor="pointer"
+                            data-selected={selectedListId === list.id ? "" : undefined}
+                            _selected={{
                                 bg: "blue.50",
-                            },
-                        }}
+                                color: "blue.700",
+                                fontWeight: "semibold",
+                                _hover: {
+                                    bg: "blue.50",
+                                },
+                            }}
 
-                        _hover={{
-                            bg: "gray.100"
-                        }}
+                            _hover={{
+                                bg: "gray.100"
+                            }}
 
-                    >
+                        >
 
-                        {list.name}
-                    </Box>
-                    <Spacer />
+                            {list.name}
+                        </Box>
 
-                    {isMobile ? <IconButton onClick={(e) => { e.stopPropagation(); handleRightclick(e, list.id) }} variant='ghost' size='xs' opacity={0.5} pt={2}><Trash2 /></IconButton> : ''}
-                </HStack>
+                        {isMobile ?
+                            <>
+                                <Spacer />
+                                <IconButton onClick={(e) => { e.stopPropagation(); handleRightclick(e, list.id) }} variant='ghost' size='xs' opacity={0.5} pt={2}><Trash2 /></IconButton>
+
+                            </>
+                            : ''}
+
+
+
+                    </HStack>
+                    {isMobile ? <Separator /> : ''}
+                </>
 
             ))}
             {/* {isMobile ?
