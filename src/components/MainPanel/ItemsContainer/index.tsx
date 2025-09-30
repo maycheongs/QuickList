@@ -43,7 +43,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
         const checked: Item[] = [];
 
         items.forEach(obj => {
-            let item = { ...obj }; // Create a mutable copy of the item
+            const item = { ...obj }; // Create a mutable copy of the item
 
             if (item.category) {
                 item.color = categoryColorMap[item.category.id]
@@ -86,6 +86,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                     {Object.keys(categorized).length ?
                         Object.entries(categorized).sort().map(([categoryId, items], index) => (
                             <CategorySection
+                                key={index}
                                 categoryId={categoryId}
                                 listId={list!.id}
                                 items={items}

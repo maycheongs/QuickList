@@ -15,14 +15,30 @@ interface SidePanelProps {
 
 export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
     const { state, error, loading, setSelectedList, isMobile } = useAppData();
+    const addList = useAddList()
+    const deleteList = useDeleteList()
+
     const [addDisabled, setAddDisabled] = useState(false)
     //right-click menu
     const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
     const [menuListId, setMenuListId] = useState<string | null>(null);
 
 
-    const addList = useAddList()
-    const deleteList = useDeleteList()
+    // Prevent scrolling when the menu is open
+    useEffect(() => {
+        const preventScroll = (e: WheelEvent) => {
+            if (menuPosition) {
+                e.preventDefault();
+            }
+        };
+
+        window.addEventListener('wheel', preventScroll, { passive: false });
+        return () => {
+            window.removeEventListener('wheel', preventScroll);
+        };
+    }, [menuPosition]);
+
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 
@@ -39,24 +55,12 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
         return newName;
     };
 
-    // Prevent scrolling when the menu is open
-    useEffect(() => {
-        const preventScroll = (e: WheelEvent) => {
-            if (menuPosition) {
-                e.preventDefault();
-            }
-        };
 
-        window.addEventListener('wheel', preventScroll, { passive: false });
-        return () => {
-            window.removeEventListener('wheel', preventScroll);
-        };
-    }, [menuPosition]);
 
     const onAddList = async () => {
         setAddDisabled(true)
         const existingNames = lists.map(l => l.name);
-        const response = await addList(generateUntitledName(existingNames))
+        await addList(generateUntitledName(existingNames))
         setAddDisabled(false)
     }
 
@@ -93,9 +97,8 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
             {isMobile ? <Separator /> : ''}
 
             {lists.map((list) => (
-                <HStack align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
+                <HStack key={list.id} align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
                     <Box
-                        key={list.id}
                         p={2}
                         pl={3}
                         borderRadius="md"

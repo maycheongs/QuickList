@@ -1,8 +1,8 @@
 //src/components/MainPanel/ListHeader.tsx
 
-import { useState, useEffect, forwardRef, useRef } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { OptimisticList } from '@/contexts/types'
-import { Box, Heading, HStack, VStack, IconButton, Text, Editable } from '@chakra-ui/react';
+import { Box, HStack, VStack, IconButton, Text, Editable } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
 import DatePicker from 'react-datepicker';
 import { CalendarDays } from 'lucide-react';
@@ -15,52 +15,59 @@ interface ListHeaderProps {
     list: Partial<OptimisticList> | null;
 }
 
+interface CustomInputProps {
+    value?: string;
+    onClick?: () => void;
+    onClear: () => void;
+}
 
-const CustomInput = forwardRef(({ value, onClick, onClear }: any, ref: any) => {
-    if (!value) {
-        // No date yet → show icon with tooltip
+
+const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
+    ({ value, onClick, onClear }, ref) => {
+        if (!value) {
+            // No date yet → show icon with tooltip
+            return (
+                <Tooltip content="Set a due date & time" showArrow>
+                    <IconButton
+                        aria-label="Select date"
+                        onClick={onClick}
+                        ref={ref}
+                        variant="outline"
+                        size="sm"
+                    > <CalendarDays />
+                    </IconButton>
+                </Tooltip>
+            );
+        }
+
+        // Date selected → show inline text
         return (
-            <Tooltip content="Set a due date & time" showArrow>
-                <IconButton
-                    aria-label="Select date"
+            <HStack gap={1}>
+                <Text
                     onClick={onClick}
-                    ref={ref}
-                    variant="outline"
-                    size="sm"
-                > <CalendarDays />
-                </IconButton>
-            </Tooltip>
+                    ref={ref as React.Ref<HTMLParagraphElement>}
+                    cursor="pointer"
+                    _hover={{ textDecoration: "underline" }}
+                    color='gray.600'
+                >
+                    <span style={{ display: "inline-flex", verticalAlign: "bottom" }}><CalendarDays /></span> Due: {value}
+                </Text>
+                <IconButton
+                    aria-label="Clear date"
+                    size="xs"
+                    variant="ghost"
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent opening datepicker
+                        onClear();
+                    }}
+                ><span>x</span></IconButton>
+            </HStack>
         );
-    }
-
-    // Date selected → show inline text
-    return (
-        <HStack gap={1}>
-            <Text
-                onClick={onClick}
-                ref={ref}
-                cursor="pointer"
-                _hover={{ textDecoration: "underline" }}
-                color='gray.600'
-            >
-                <span style={{ display: "inline-flex", verticalAlign: "bottom" }}><CalendarDays /></span> Due: {value}
-            </Text>
-            <IconButton
-                aria-label="Clear date"
-                size="xs"
-                variant="ghost"
-                onClick={(e) => {
-                    e.stopPropagation(); // prevent opening datepicker
-                    onClear();
-                }}
-            ><span>x</span></IconButton>
-        </HStack>
-    );
-});
+    });
 
 const ListHeader = ({ list }: ListHeaderProps) => {
     const updateList = useUpdateList()
-    const { state, isMobile } = useAppData();
+    const { state } = useAppData();
     const [title, setTitle] = useState(list?.name || '');
     const [isEditing, setIsEditing] = useState(list?.isNew || false);
     console.log('duedate', list?.dueDate)
@@ -75,7 +82,7 @@ const ListHeader = ({ list }: ListHeaderProps) => {
             setIsEditing(false);
         }
 
-    }, [list?.id])
+    }, [list?.id, list?.isNew])
 
 
     const changeDueDate = (date: Date | null) => {
@@ -100,7 +107,7 @@ const ListHeader = ({ list }: ListHeaderProps) => {
         //if new name is a duplicate, append (1)
         const existingNames = Object.values(state.lists).map(l => l.name);
         if (existingNames.includes(newTitle.trim())) {
-            let baseName = newTitle.trim();
+            const baseName = newTitle.trim();
             let name = baseName;
             let counter = 1;
             while (existingNames.includes(name)) {

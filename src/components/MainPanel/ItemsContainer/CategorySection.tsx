@@ -58,7 +58,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
         }
         //If it is a duplicate add a counter to it
         const existingCategoryNames = categories.map(c => c.name.toUpperCase())
-        let baseName = name
+        const baseName = name
         let counter = 1
         while (existingCategoryNames.includes(name.toUpperCase())) {
             name = `${baseName} (${counter})`

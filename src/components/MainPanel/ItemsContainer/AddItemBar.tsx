@@ -1,11 +1,9 @@
 //MainPanel/AddItemBar.tsx
-import { use, useState } from 'react';
-import { Box, HStack, Text, IconButton, ForProps, useListCollection } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, HStack, } from '@chakra-ui/react';
 import { Editable } from '@chakra-ui/react'
-import { Plus } from 'lucide-react';
 import { Category } from '.'
 import { useAddItem } from '@/contexts/AppDataOperations';
-import { BiTrim } from 'react-icons/bi';
 
 
 interface AddItemBarProps {
@@ -14,12 +12,12 @@ interface AddItemBarProps {
 }
 
 
-function AddItemBar({ categories, listId }: AddItemBarProps) {
+function AddItemBar({ listId }: AddItemBarProps) {
 
     const addItem = useAddItem()
     const [itemName, setItemName] = useState('');
-    const [currentCategory, setCurrentCategory] = useState(null)
-    const [isLastMinute, setIsLastMinute] = useState(false)
+    // const [currentCategory, setCurrentCategory] = useState(null)
+    // const [isLastMinute, setIsLastMinute] = useState(false)
 
 
     async function handleAddItem(value: string) {

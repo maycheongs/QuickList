@@ -7,7 +7,7 @@ import type { List } from '@/contexts/types'
 
 function HomeContent() {
     const isMobile = useBreakpointValue({ base: true, md: false })
-    const { loading, state, setSelectedList } = useAppData();
+    const { loading, state } = useAppData();
     const { selectedListId, lists } = state;
 
     if (loading) {

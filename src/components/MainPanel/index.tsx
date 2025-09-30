@@ -1,9 +1,9 @@
 'use client';
-import { Box, Spinner, Center, Button, HStack } from '@chakra-ui/react';
+import { Box, Center, Button, HStack } from '@chakra-ui/react';
 import { useAppData } from '../../contexts/AppContext';
 import ItemsContainer from './ItemsContainer';
 import ListHeader from './ListHeader';
-import { List, OptimisticList } from '@/contexts/types'
+import { OptimisticList } from '@/contexts/types'
 import { MoveLeft } from 'lucide-react';
 
 interface MainPanelProps {

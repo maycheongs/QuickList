@@ -28,7 +28,7 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
 
             //Generate a default name if none provided
             if (!action.payload.name || action.payload.name.trim() === "") {
-                let baseName = "Untitled";
+                const baseName = "Untitled";
                 let name = baseName
                 let counter = 1;
                 const existingNames = new Set(Object.values(state.lists).map(l => l.name));
@@ -46,6 +46,7 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
             };
 
         case "REMOVE_LIST": {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [action.payload.listId]: _, ...rest } = state.lists;
             let newSelected = state.selectedListId;
             //If currently selected list is deleted, select the first list
@@ -57,6 +58,7 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
 
         case "REPLACE_LIST": {
             const { tempId, newList } = action.payload;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [tempId]: _, ...rest } = state.lists;
             return {
                 ...state,

@@ -186,6 +186,7 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
                             <Menu.Separator />
                             {categories.filter(cat => cat.id !== item.category?.id).map(category => (
                                 <Menu.Item
+                                    key={category.id}
                                     value={category.name}
                                     onClick={() => onSetCategory(category, item.id)}
                                 >
