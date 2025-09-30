@@ -272,8 +272,22 @@ const resolvers = {
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
-const handler = startServerAndCreateNextHandler(server, {
+// create handler once
+const graphqlHandler = startServerAndCreateNextHandler(server, {
     context: async (req) => ({ req, prisma }),
 });
 
-export { handler as GET, handler as POST };
+// Wrap for Next.js App Router
+export async function GET(req: NextRequest) {
+    return graphqlHandler(req);
+}
+
+export async function POST(req: NextRequest) {
+    return graphqlHandler(req);
+}
+
+// const handler = startServerAndCreateNextHandler(server, {
+//     context: async (req) => ({ req, prisma }),
+// });
+
+// export { handler as GET, handler as POST };
