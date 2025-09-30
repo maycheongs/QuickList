@@ -154,15 +154,16 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
             const list = state.lists[listId];
             console.log('updating category', id, changes, 'current list', list)
             if (!list) return state;
+            const updatedCategories = { ...list }.categories.map(c => c.id === id ? { ...c, ...changes } : c)
+            const updatedItems = { ...list }.items.map(item => item.category?.id === id ? { ...item, category: { ...item.category, ...changes } } : item)
             return {
                 ...state,
                 lists: {
                     ...state.lists,
                     [listId]: {
                         ...list,
-                        categories: list.categories.map((c) =>
-                            c.id === id ? { ...c, ...changes } : c
-                        ),
+                        categories: updatedCategories,
+                        items: updatedItems,
                     },
                 },
             };

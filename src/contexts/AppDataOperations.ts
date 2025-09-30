@@ -13,6 +13,7 @@ import {
 } from "@/graphql/codegen";
 import { ListItem, ListCategory, List, ListDataState } from "@/contexts/types";
 import { useAppData, seedUser } from "./AppContext";
+import { ListIndicator } from "@chakra-ui/react";
 
 //LLIST OPERATIONS
 export function useAddList() {
@@ -207,5 +208,28 @@ export function useAddCategory() {
             console.error('Failed to create category', err);
             dispatch({ type: "DELETE_CATEGORY", payload: { listId, id: tempId } })
         }
+    }
+}
+
+export function useUpdateCategory() {
+    const { dispatch } = useAppData()
+    const [updateCategory] = useUpdateCategoryMutation()
+
+    return async (listId: List['id'], categoryId: ListCategory['id'], changes: Partial<ListCategory>) => {
+
+        if (!changes.name) return
+        //optimistically update
+        dispatch({ type: "UPDATE_CATEGORY", payload: { listId, id: categoryId, changes } })
+
+        try {
+            const { data } = await updateCategory({ variables: { categoryId, name: changes.name } })
+            if (!data?.updateCategory) throw new Error("No data returned from updateCategory")
+            return { success: true }
+
+        } catch (err) {
+            console.error('Failed to update category')
+            return { success: false }
+        }
+
     }
 }

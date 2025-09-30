@@ -54,11 +54,12 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
             } else if (item.lastMinute) {
                 lastMinute.push(item);
             } else if (item.category) {
-                const categoryKey = `${item.category.id}_${item.category.name}`
-                if (!categorized[categoryKey]) {
-                    categorized[categoryKey] = [];
+                const categoryId = item.category.id
+
+                if (!categorized[categoryId]) {
+                    categorized[categoryId] = [];
                 }
-                categorized[categoryKey].push(item);
+                categorized[categoryId].push(item);
             } else {
                 uncategorized.push(item);
             }
@@ -74,7 +75,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                     {/* Uncategorized */}
                     {uncategorized.length ?
                         <CategorySection
-                            categoryKey={null}
+                            categoryId={null}
                             items={uncategorized}
                             color='gray'
                             categories={categories}
@@ -83,11 +84,12 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
 
                     {/* Categories */}
                     {Object.keys(categorized).length ?
-                        Object.entries(categorized).sort().map(([categoryKey, items], index) => (
+                        Object.entries(categorized).sort().map(([categoryId, items], index) => (
                             <CategorySection
-                                categoryKey={categoryKey}
+                                categoryId={categoryId}
+                                listId={list!.id}
                                 items={items}
-                                color={categoryColorMap[(categoryKey.split('_')[0])]}
+                                color={categoryColorMap[categoryId]}
                                 categories={categories}
                             />
                         )) : ''}

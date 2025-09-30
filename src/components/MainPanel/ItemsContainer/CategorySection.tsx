@@ -1,13 +1,17 @@
 //components/MainPanel/ItemsContainer/CategorySection.tsx
 'use client';
-import { Box, VStack, HStack, Badge, Separator } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, VStack, HStack, Badge, Separator, Collapsible, Editable } from '@chakra-ui/react';
+import { ChevronDown, Pencil } from 'lucide-react';
 import ListItem from './ListItem'
 import { Item } from '.';
 import { useAppData } from '@/contexts/AppContext';
+import { useUpdateCategory } from '@/contexts/AppDataOperations';
 
 
 type CategorySectionProps = {
-    categoryKey?: string | null;
+    categoryId?: string | null;
+    listId?: string;
     items: Item[]
     isLastMinute?: boolean;
     isChecked?: boolean;
@@ -15,13 +19,16 @@ type CategorySectionProps = {
     categories: { id: string; name: string }[]
 };
 
-function CategorySection({ categoryKey, items, isChecked, isLastMinute, color, categories }: CategorySectionProps) {
+function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, color, categories }: CategorySectionProps) {
 
     const { dispatch } = useAppData();
+    const updateCategory = useUpdateCategory()
+    const [open, setOpen] = useState(true)
 
     // console.log('ischecked', isChecked, 'items', items);
 
-    const [categoryId, categoryName] = categoryKey ? categoryKey.split('_') : [null, null];
+    const categoryName = categories.find(c => c.id === categoryId)?.name || null
+    const [editable, setEditable] = useState(categoryName || '')
 
     const optimisticDeleteCategoryIfEmpty = (listId: string, categoryId: string, itemId: string) => {
         //check if any items are using this category
@@ -31,37 +38,137 @@ function CategorySection({ categoryKey, items, isChecked, isLastMinute, color, c
         }
     }
 
+    const onCategoryChange = async (name: string) => {
+        console.log('category change')
+        //if invalid or name is unchanged return
+        if (!listId || !categoryName || !categoryId || name === categoryName) return
+        console.log('gets here 1')
+        name = name.trim()
+        //if empty revert to original name
+        if (!name) {
+            setEditable(categoryName)
+            return
+        }
+        //If it is a duplicate add a counter to it
+        const existingCategoryNames = categories.map(c => c.name.toUpperCase())
+        let baseName = name
+        let counter = 1
+        while (existingCategoryNames.includes(name.toUpperCase())) {
+            name = `${baseName} (${counter})`
+            counter++
+        }
+        setEditable(name)
+        const response = await updateCategory(listId, categoryId, { name })
+        //If server fails then revert to previous name
+        if (!response?.success) {
+            dispatch({ type: 'UPDATE_CATEGORY', payload: { listId, id: categoryId, changes: { name: categoryName } } })
+        }
+    }
+
 
     return (
         <Box py={1} color='gray.500'>
-            {(categoryKey || isChecked || isLastMinute) ?
-                <><HStack mb={2}>
-                    <Box
-                        fontWeight={'semibold'}
-                        borderLeftWidth="3px"
-                        borderLeftStyle="solid"
-                        borderLeftColor={`${color}.400`}
-                        pl={2}
 
-                    >
-                        {(categoryName || (isLastMinute ? 'Last Minute' : 'Completed')).toUpperCase()}
-                    </Box>
-                    <Badge size='sm' fontWeight='500' fontSize={11} color='inherit'>
-                        {`${items.length} items`}
-                    </Badge>
+            <Collapsible.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+                {/**CATEGORY HEADER AND ITEM COUNT */}
+                {(categoryName || isChecked || isLastMinute) ?
+                    <>
+                        <HStack mb={2} onClick={(e) => {
+                            // Only toggle if not clicking on the editable area
+                            const target = e.target as HTMLElement;
+                            if (!target.closest('[data-scope="editable"]')) {
+                                setOpen(!open);
+                            }
+                        }}
+                        >
+                            <Collapsible.Trigger asChild>
+                                <Box
+                                    as={ChevronDown}
+                                    w="12px"
+                                    h="12px"
+                                    color="gray.400"
+                                    transform={open ? 'rotate(0deg)' : 'rotate(-90deg)'}
+                                    transition="transform 0.2s ease"
+                                    flexShrink={0}
+                                />
+                            </Collapsible.Trigger>
+                            <HStack gap={1} alignItems='center'>
 
-                </HStack><Separator mb={1} /></> : ''}
+                                {categoryName ?
+                                    <Editable.Root
+                                        value={editable}
+                                        onValueChange={(e) => setEditable(e.value)}
+                                        activationMode="dblclick"
+                                        onValueCommit={(e) => onCategoryChange(e.value)}
+                                        disabled={categoryId!.startsWith('temp')}
+                                    >
+                                        <Editable.Preview
+                                            fontWeight={'semibold'}
+                                            borderLeftWidth="3px"
+                                            borderLeftStyle="solid"
+                                            borderLeftColor={`${color}.400`}
+                                            pl={2}
+                                            whiteSpace="nowrap"
+                                            display="inline-flex"
+                                            alignItems="center"
+                                            gap={1.5}
+                                            _hover={{
+                                                '& .edit-icon': {
+                                                    opacity: 1,
+                                                },
+                                            }}
+                                        >
+                                            {editable.toUpperCase()}
 
-            <VStack as="ul" gap={1} align="stretch" className="group">
-                {items.map(item => (
-                    <ListItem
-                        key={item.id}
-                        item={item}
-                        categories={categories}
-                        optimisticDeleteCategoryIfEmpty={optimisticDeleteCategoryIfEmpty}
-                    />
-                ))}
-            </VStack>
+                                        </Editable.Preview>
+                                        <Editable.Input
+                                            fontWeight={'semibold'}
+                                            borderLeftWidth="3px"
+                                            borderLeftStyle="solid"
+                                            borderLeftColor={`${color}.400`}
+                                            pl={2}
+                                            whiteSpace="nowrap"
+                                            _focus={{
+                                                outline: 'none',
+                                                borderBottom: '1px solid',
+                                                borderBottomColor: 'blue.500',
+                                            }}
+                                        />
+                                    </Editable.Root> :
+
+                                    <Box
+                                        fontWeight={'semibold'}
+                                        borderLeftWidth="3px"
+                                        borderLeftStyle="solid"
+                                        borderLeftColor={`${color}.400`}
+                                        pl={2}
+                                    > {isLastMinute ? 'LAST MINUTE' : 'COMPLETED'}
+                                    </Box>
+
+                                }
+                                <Badge size='sm' fontWeight='500' fontSize={11} color='inherit'>
+                                    {`${items.length} items`}
+                                </Badge>
+                            </HStack>
+
+                        </HStack><Separator mb={1} />
+                    </> : ''}
+
+                {/**ITEMS */}
+
+                <Collapsible.Content>
+                    <VStack as="ul" gap={1} align="stretch" className="group">
+                        {items.map(item => (
+                            <ListItem
+                                key={item.id}
+                                item={item}
+                                categories={categories}
+                                optimisticDeleteCategoryIfEmpty={optimisticDeleteCategoryIfEmpty}
+                            />
+                        ))}
+                    </VStack>
+                </Collapsible.Content>
+            </Collapsible.Root>
         </Box>
     )
 
