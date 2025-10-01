@@ -1,9 +1,9 @@
 //src/components/SidePanel.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VStack, Heading, Box, HStack, Separator, Spacer, IconButton, Menu, Portal } from '@chakra-ui/react';
-import { ListPlus, Trash2 } from 'lucide-react'
+import { ListPlus, RectangleVertical, Trash2 } from 'lucide-react'
 import { useAppData } from '@/contexts/AppContext';
 import { useAddList, useDeleteList } from '@/contexts/AppDataOperations';
 
@@ -97,7 +97,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
             {isMobile ? <Separator /> : ''}
 
             {lists.map((list) => (
-                <>
+                <React.Fragment key={list.id}>
                     <HStack key={list.id} justify="space-between" align='stretch' onContextMenu={(e) => handleRightclick(e, list.id)} onClick={() => setSelectedList(list.id)} fontSize={isMobile ? 16 : 'inherit'}>
                         <Box
                             flex={1}
@@ -136,7 +136,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
 
                     </HStack>
                     {isMobile ? <Separator /> : ''}
-                </>
+                </React.Fragment>
 
             ))}
             {/* {isMobile ?
