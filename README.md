@@ -3,7 +3,7 @@
 A  **list manager** built with a **Next.js + GraphQL + Prisma**.  
 Designed for simplicity, speed, type safety, and scalability
 ## 📸 See it Live
-- Deployed on Render at https://list-app-s2zd.onrender.com/
+- Deployed on https://quickquacklist.netlify.app/
 
 Desktop Screenshot
 
