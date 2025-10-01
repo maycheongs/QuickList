@@ -23,7 +23,7 @@ function HomeContent() {
     const listNavData = Object.values(lists).map((list: List) => ({ id: list.id, name: list.name, dueDate: list.dueDate }))
 
     return (
-        <HStack align="stretch" gap={0} height="100vh" >
+        <HStack align="stretch" gap={0} height={["100dvh", "100vh"]} >
             {!isMobile || selectedListId === null ?
                 <Box w={isMobile ? "100%" : "300px"} borderRight="1px solid lightgray" >
                     <SidePanel lists={listNavData} selectedListId={selectedListId} />
