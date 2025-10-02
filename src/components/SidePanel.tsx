@@ -88,10 +88,10 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
     }
 
     return (
-        <VStack as="nav" gap={1} align="stretch" p={4} height='100%' overflowY="auto" fontSize={'sm'} minWidth={150}>
+        <VStack as="nav" gap={1} align="stretch" p={4} height='100%' overflowY="auto" fontSize={'sm'} minWidth={250}>
             <HStack gap={2} justify='space-between' pr={3} pb={2}>
                 <Heading size={isMobile ? "2xl" : "lg"} ml={2}>My Lists</Heading>
-                {<IconButton size={isMobile ? "2xl" : "lg"} disabled={addDisabled} variant='ghost' aria-label="add-list" onClick={onAddList}><ListPlus /></IconButton>}
+                {<IconButton size={isMobile ? "2xl" : "lg"} color='inherit' disabled={addDisabled} variant='ghost' aria-label="add-list" onClick={onAddList}><ListPlus /></IconButton>}
             </HStack>
 
             {isMobile ? <Separator /> : ''}
@@ -118,6 +118,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
                             _hover={{
                                 bg: "gray.100"
                             }}
+                            wordBreak={'break-word'}
 
                         >
 
@@ -127,7 +128,7 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
                         {isMobile ?
                             <>
                                 {/* <Spacer /> */}
-                                <IconButton onClick={(e) => { e.stopPropagation(); handleRightclick(e, list.id) }} variant='ghost' size='xs' opacity={0.5} pt={2}><Trash2 /></IconButton>
+                                <IconButton onClick={(e) => { e.stopPropagation(); handleRightclick(e, list.id) }} variant='ghost' size='xs' opacity={isMobile ? 0.8 : 0.5} pt={2}><Trash2 /></IconButton>
 
                             </>
                             : ''}

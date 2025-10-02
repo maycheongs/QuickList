@@ -11,7 +11,8 @@ import { useAppData } from '@/contexts/AppContext';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-const MAX_LENGTH = 80 // MAX LENGTH OF A TITLE
+const MAX_LENGTH = 75
+// MAX LENGTH OF A TITLE
 
 interface ListHeaderProps {
     list: Partial<OptimisticList> | null;
@@ -153,10 +154,11 @@ const ListHeader = ({ list }: ListHeaderProps) => {
                     onFocus={() => console.log('editable focus', title)}
                     edit={isEditing}
                     placeholder="List Name"
+                    wordBreak={'break-word'}
 
                 >
                     <Editable.Preview fontSize='2xl' fontWeight={'bold'} onClick={() => setIsEditing(true)} />
-                    <Editable.Input fontSize='2xl' fontWeight={'bold'} value={title} onPaste={(e) => handleValuePaste(e)} />
+                    <Editable.Input fontSize='2xl' fontWeight={'bold'} maxLength={MAX_LENGTH} onPaste={(e) => handleValuePaste(e)} />
                 </Editable.Root>
 
                 <DatePicker

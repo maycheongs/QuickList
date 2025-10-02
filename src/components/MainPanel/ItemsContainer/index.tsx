@@ -1,5 +1,5 @@
 //components/MainPanel/ItemsContainer
-
+import { useRef, useState, useEffect } from 'react';
 import { GetListQuery } from '@/graphql/codegen';
 import { Box, VStack } from '@chakra-ui/react';
 import CategorySection from './CategorySection';
@@ -27,8 +27,11 @@ interface ItemsContainerProps {
 
 const ItemsContainer = ({ list }: ItemsContainerProps) => {
 
+    const containerRef = useRef<HTMLDivElement | null>(null)
+
     const { items, categories } = list
     const { isMobile } = useAppData()
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
 
 
     const categoryColorMap: Record<Category['id'], string> = {};
@@ -70,9 +73,32 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
 
         return { categorized, uncategorized, lastMinute, checked };
     };
+
+    // VisualViewport handling
+    // -------------------------
+    useEffect(() => {
+        if (!list || !isMobile) return;
+
+        const onViewportResize = () => {
+            if (window.visualViewport) {
+                const vh = window.innerHeight;
+                const visualHeight = window.visualViewport.height;
+                const keyboard = vh - visualHeight;
+                setKeyboardHeight(keyboard > 0 ? keyboard : 0);
+            }
+        };
+
+        window.visualViewport?.addEventListener('resize', onViewportResize);
+        window.addEventListener('resize', onViewportResize); // fallback
+
+        return () => {
+            window.visualViewport?.removeEventListener('resize', onViewportResize);
+            window.removeEventListener('resize', onViewportResize);
+        };
+    }, [isMobile]);
     return (
         <Box as="section" flex={1} py={2} px={5} pr={isMobile ? 1 : 5} position="relative" overflow="hidden">
-            <Box overflowY="auto" height="100%" pb={16}>
+            <Box ref={containerRef} overflowY="auto" height="100%" pb={isMobile ? `${keyboardHeight + 16}px` : 16}>
                 <VStack gap={0} align="stretch">
                     {/* Uncategorized */}
                     {uncategorized.length ?
@@ -119,7 +145,7 @@ const ItemsContainer = ({ list }: ItemsContainerProps) => {
                     ) : ''}
                 </VStack>
             </Box>
-            <AddItemBar categories={categories} listId={list.id} />
+            <AddItemBar categories={categories} listId={list.id} containerRef={containerRef} />
         </Box>
     )
 }

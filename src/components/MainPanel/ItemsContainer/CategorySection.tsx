@@ -1,6 +1,6 @@
 //components/MainPanel/ItemsContainer/CategorySection.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, VStack, HStack, Badge, Separator, Collapsible, Editable, IconButton, Spacer } from '@chakra-ui/react';
 import { ChevronDown, PencilLine, Check, X } from 'lucide-react';
 import ListItem from './ListItem'
@@ -27,6 +27,8 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
 
     const categoryName = categories.find(c => c.id === categoryId)?.name || null
     const [editable, setEditable] = useState(categoryName || '')
+    const [isEditing, setIsEditing] = useState(false)
+    const holdTimeout = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
         if (!categories.length) return
@@ -34,6 +36,27 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
         category && setEditable(category.name)
 
     }, [categoryId])
+
+
+    //Touch-hold for touch screen behavior
+    const isTouchScreen = () => {
+        if (typeof window === "undefined") return false;
+        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    };
+
+    const handleTouchStart = () => {
+        holdTimeout.current = setTimeout(() => {
+            setIsEditing(true)
+        }, 600)
+
+    }
+    const handleTouchEnd = () => {
+        if (holdTimeout.current) {
+            clearTimeout(holdTimeout.current)
+            holdTimeout.current = null
+        }
+
+    }
 
 
 
@@ -45,11 +68,11 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
         }
     }
 
+
     const onCategoryChange = async (name: string) => {
-        console.log('category change')
+
         //if invalid or name is unchanged return
         if (!listId || !categoryName || !categoryId || name === categoryName) return
-        console.log('gets here 1')
         name = name.trim()
         //if empty revert to original name
         if (!name) {
@@ -110,6 +133,20 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                         activationMode={isMobile ? "none" : "dblclick"}
                                         onValueCommit={(e) => onCategoryChange(e.value)}
                                         disabled={categoryId!.startsWith('temp')}
+                                        fontSize='inherit'
+                                        // only control edit mode on mobile
+                                        {...(isTouchScreen() ?
+                                            {
+                                                edit: isEditing,
+                                                onBlur: () => { setIsEditing(false) },
+                                                onKeyDown: (e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        setIsEditing(false);
+                                                        onCategoryChange(editable)
+                                                    }
+                                                }
+                                            } : {})}
                                     >
                                         <Editable.Preview
                                             fontWeight={'semibold'}
@@ -129,14 +166,16 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                             maxW="55vw"
                                             textOverflow="ellipsis"
                                             overflow="hidden"
-
-                                        // pointerEvents={isMobile ? "none" : "auto"}
+                                            fontSize='inherit'
+                                            onTouchStart={isTouchScreen() ? handleTouchStart : undefined}
+                                            onTouchEnd={isTouchScreen() ? handleTouchEnd : undefined}
                                         >
                                             {editable.toUpperCase()}
 
                                         </Editable.Preview>
                                         <Editable.Input
                                             fontWeight={'semibold'}
+                                            fontSize='inherit'
                                             borderLeftWidth="3px"
                                             borderLeftStyle="solid"
                                             borderLeftColor={`${color}.400`}
@@ -148,17 +187,12 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                                 borderBottomColor: 'blue.500',
                                             }}
                                         />
-                                        {isMobile ? <Editable.Control>
+                                        {isMobile && !isTouchScreen() ? <Editable.Control>
                                             <Editable.EditTrigger asChild onClick={(e) => e.stopPropagation()}>
                                                 <IconButton variant="ghost" size="xs">
                                                     <PencilLine />
                                                 </IconButton>
                                             </Editable.EditTrigger>
-                                            <Editable.CancelTrigger asChild>
-                                                <IconButton variant="outline" size="xs" onClick={(e) => e.stopPropagation()}>
-                                                    <X />
-                                                </IconButton>
-                                            </Editable.CancelTrigger>
                                             <Editable.SubmitTrigger asChild>
                                                 <IconButton variant="outline" size="xs" onClick={(e) => e.stopPropagation()}>
                                                     <Check />

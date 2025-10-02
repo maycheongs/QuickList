@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Box, HStack, Text, Checkbox, Badge, Button, IconButton, Menu, Icon, Input } from '@chakra-ui/react';
-import { Settings, Zap, Trash } from 'lucide-react';
+import { Circle, Zap, Trash } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useDeleteItem, useUpdateItem, useAddCategory } from '@/contexts/AppDataOperations';
 
@@ -137,6 +137,9 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
             opacity={item.checked ? 0.6 : 1}
         >
             <HStack gap={2}>
+
+                {/**CHECK BOX */}
+
                 <Checkbox.Root
                     checked={item.checked}
                     onCheckedChange={(details) => toggleCheck(details.checked === true, item.id)}
@@ -147,23 +150,28 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
 
                 </Checkbox.Root>
 
+                {/**ITEM TEXT */}
+
                 <Text
                     flex={1}
                     textDecoration={item.checked ? 'line-through' : 'none'}
                     color={item.checked ? 'gray.500' : 'inherit'}
+                    wordBreak='break-word'
                 >
                     {item.name}
                 </Text>
 
+                {/** CATEGORY MENU */}
+
                 <Menu.Root open={open} onOpenChange={e => setOpen(e.open)} onHighlightChange={({ highlightedValue }) => { if (highlightedValue && categories.map(c => c.name).includes(highlightedValue)) setNewCategory(highlightedValue) }}>
 
-                    <Menu.Trigger asChild ref={triggerRef} onMouseLeave={handleMouseLeaveMenu} >
-                        <Badge colorPalette={item.color} variant="subtle"
-                            maxW={isMobile ? "70px" : "150px"} overflow="hidden" textOverflow="ellipsis"
-                            display="inline-block"
+                    <Menu.Trigger asChild ref={triggerRef}  >
+                        {isMobile ? <Icon size='md' color={`${item.color}.400`} fill={`${item.color}.400`} display='inline-block'><Circle /></Icon> : <Badge colorPalette={item.color} variant="subtle"
+                            maxW={"150px"} overflow="hidden" textOverflow="ellipsis"
+                            display="inline-block" onMouseLeave={handleMouseLeaveMenu}
                         >
                             {item.category ? item.category.name : 'Category'}
-                        </Badge>
+                        </Badge>}
                     </Menu.Trigger>
 
                     <Menu.Positioner>
@@ -203,9 +211,10 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
                         </Menu.Content>
                     </Menu.Positioner>
                 </Menu.Root>
-                <HStack gap={1} opacity={isMobile ? 1 : 0} _groupHover={{ opacity: 1 }}>
 
-                    {/** LAST MINUTE TOGGLE */}
+                {/** LAST MINUTE TOGGLE */}
+
+                <HStack gap={1} opacity={isMobile ? 1 : 0} _groupHover={{ opacity: 1 }}>
                     <Tooltip content={!item.lastMinute ? "Mark as last minute" : "Unmark last minute"} >
                         <Button
                             size="xs"
