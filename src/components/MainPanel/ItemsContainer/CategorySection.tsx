@@ -29,6 +29,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
     const [editable, setEditable] = useState(categoryName || '')
     const [isEditing, setIsEditing] = useState(false)
     const holdTimeout = useRef<NodeJS.Timeout | null>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         if (!categories.length) return
@@ -47,6 +48,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
     const handleTouchStart = () => {
         holdTimeout.current = setTimeout(() => {
             setIsEditing(true)
+            inputRef.current?.focus()
         }, 600)
 
     }
@@ -174,6 +176,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
 
                                         </Editable.Preview>
                                         <Editable.Input
+                                            ref={inputRef}
                                             fontWeight={'semibold'}
                                             fontSize='inherit'
                                             borderLeftWidth="3px"

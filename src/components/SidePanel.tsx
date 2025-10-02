@@ -83,7 +83,6 @@ export default function SidePanel({ lists, selectedListId }: SidePanelProps) {
     }
 
     const handleDeleteList = () => {
-        console.log('delete list', menuListId);
         menuListId && deleteList(menuListId)
     }
 

@@ -81,7 +81,7 @@ const resolvers = {
         },
 
         createList: async (_parent: ResolverParent, args: { name: string; type: 'TASK' | 'PACKING'; userId: QueryUserArgs['id'] }) => {
-            console.log('CREATE LIST IN RESOLVERS', args);
+
             return prisma.list.create({
                 data: {
                     name: args.name,
@@ -163,7 +163,7 @@ const resolvers = {
                     });
                     if (count > 0) deletedCategory = currentItem.category
                 }
-                console.log('updated item', updatedItem, 'deletedCat', deletedCategory)
+                // console.log('updated item', updatedItem, 'deletedCat', deletedCategory)
 
                 return { item: updatedItem, deletedCategory };
             });
