@@ -50,7 +50,6 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
     }
 
     const handleDeleteItem = async () => {
-        console.log('deleting item', item.name)
         await deleteItem(listId, item.id)
     }
 
@@ -63,7 +62,6 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
     }
 
     const onSetCategory = (category: Category | null, itemId: Item['id']) => {
-        console.log('setting category', category)
         updateItem(listId, itemId, { category })
     }
 
@@ -106,7 +104,6 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
         const match = typed.length && categories.find(c => c.name.toLowerCase().startsWith(typed.toLowerCase()))
 
         if (match && match.name.length > typed.length) {
-            console.log('dpes this')
             setNewCategory(match.name)
             requestAnimationFrame(() => {
                 e.target.setSelectionRange(typed.length, match.name.length)

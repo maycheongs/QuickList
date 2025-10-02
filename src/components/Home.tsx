@@ -18,7 +18,7 @@ function HomeContent() {
         );
     }
 
-    console.log('LISTS', Object.values(lists).map(l => ({ name: l.name, isNew: l.isNew || null })))
+
     const listData = selectedListId ? lists[selectedListId] : null;
     const listNavData = Object.values(lists).map((list: List) => ({ id: list.id, name: list.name, dueDate: list.dueDate }))
 

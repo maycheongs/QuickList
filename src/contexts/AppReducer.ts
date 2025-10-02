@@ -3,7 +3,7 @@ import type { AppState, AppAction } from "./types";
 export function appDataReducer(state: AppState, action: AppAction): AppState {
     switch (action.type) {
         case "SET_ALL_LISTS":
-            console.log('SETTING ALL LISTS', action.payload)
+            console.log('SET ALL LISTS', action.payload)
             return { ...state, lists: action.payload };
 
         case "SET_SELECTED_LIST":
@@ -154,7 +154,7 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
         case "UPDATE_CATEGORY": {
             const { listId, id, changes } = action.payload;
             const list = state.lists[listId];
-            console.log('updating category', id, changes, 'current list', list)
+            console.log('UPDATE_CATEGORY', id, changes, 'current list', list)
             if (!list) return state;
             const updatedCategories = { ...list }.categories.map(c => c.id === id ? { ...c, ...changes } : c)
             const updatedItems = { ...list }.items.map(item => item.category?.id === id ? { ...item, category: { ...item.category, ...changes } } : item)
@@ -175,7 +175,6 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
             const { listId, id } = action.payload;
             const list = state.lists[listId];
             if (!list) return state;
-            console.log('deleting category', id, 'current list', list.categories)
             const newState = {
                 ...state,
                 lists: {
@@ -187,7 +186,6 @@ export function appDataReducer(state: AppState, action: AppAction): AppState {
                 },
             }
 
-            console.log('new state after delete category', newState.lists[listId].categories)
             return newState
         }
 

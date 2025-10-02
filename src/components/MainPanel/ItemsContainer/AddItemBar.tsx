@@ -24,7 +24,6 @@ function AddItemBar({ containerRef, listId }: AddItemBarProps) {
 
     async function handleAddItem(value: string) {
         if (!listId || !value.trim()) return
-        console.log('adding item', value)
         setItemName('')
         addItem(listId, { name: value })
         //go to top of list

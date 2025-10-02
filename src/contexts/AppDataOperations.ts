@@ -69,7 +69,6 @@ export function useUpdateList() {
         try {
             const { data, errors } = await updateListMutation({ variables: { listId, ...changes } });
             if (errors?.length) { throw new Error(errors.map(e => e.message).join(", ")); };
-            console.log('update list operation data', data)
             return { success: true }
         } catch (err) {
             console.error(err, 'attempting to roll back dispatch update');

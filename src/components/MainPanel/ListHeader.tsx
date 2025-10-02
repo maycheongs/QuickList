@@ -72,7 +72,6 @@ const ListHeader = ({ list }: ListHeaderProps) => {
     const { state } = useAppData();
     const [title, setTitle] = useState(list?.name || '');
     const [isEditing, setIsEditing] = useState(list?.isNew || false);
-    console.log('duedate', list?.dueDate)
     const [listDueDate, setDueDate] = useState<Date | null>(list?.dueDate ? new Date(list.dueDate) : null);
 
     useEffect(() => {

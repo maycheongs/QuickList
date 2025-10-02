@@ -24,7 +24,7 @@ export default function MainPanel({ list }: MainPanelProps) {
     }
 
     const listHeaderData = list ? { id: list.id, name: list.name, dueDate: list.dueDate, isNew: list.isNew } : null;
-    console.log('Rendering main panel CATEGORIES', list.categories)
+
 
     return (
         <Box as="main" fontSize={isMobile ? 16 : 14} height={["100dvh", "100vh"]} display="flex" flexDirection="column" w="100%">
