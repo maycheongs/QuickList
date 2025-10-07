@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
-import { Box, HStack, Text, Checkbox, Badge, Button, IconButton, Menu, Icon, Input } from '@chakra-ui/react';
-import { Circle, Zap, Trash } from 'lucide-react';
+import { Box, HStack, Text, Checkbox, Badge, Button, IconButton, Menu, Icon, Input, Editable } from '@chakra-ui/react';
+import { Circle, Zap, Trash, GripVertical } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useDeleteItem, useUpdateItem, useAddCategory } from '@/contexts/AppDataOperations';
 
@@ -15,6 +15,7 @@ interface ListItemProps {
     item: Item;
     categories: Category[];
     optimisticDeleteCategoryIfEmpty: (listId: string, categoryId: string, itemId: string) => void;
+    // isTouchScreen: boolean;
 }
 
 
@@ -27,10 +28,12 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
 
     const [open, setOpen] = useState(false);
     const [newCategory, setNewCategory] = useState('')
-    const categoryInputRef = useRef<HTMLInputElement>(null)
+    const [editable, setEditable] = useState(item.name || '')
     const triggerRef = useRef<HTMLButtonElement | null>(null); //access DOM elements directly
     const menuRef = useRef<HTMLDivElement | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const holdTimeout = useRef<NodeJS.Timeout | null>(null)
+    const editTriggerRef = useRef<HTMLButtonElement>(null);
 
 
     if (!listId) return null
@@ -118,6 +121,24 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
         setNewCategory(prev => prev.slice(0, (caretPos || 1) - 1))
     }
 
+    const handleTouchStart = () => {
+        holdTimeout.current = setTimeout(() => {
+            editTriggerRef.current?.click()
+        }, 600)
+
+    }
+    const handleTouchEnd = () => {
+        if (holdTimeout.current) {
+            clearTimeout(holdTimeout.current)
+            holdTimeout.current = null
+        }
+
+    }
+
+    const handleEditName = (name: string) => {
+        console.log('change name', name)
+    }
+
 
 
     return (
@@ -134,6 +155,7 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
             opacity={item.checked ? 0.6 : 1}
         >
             <HStack gap={2}>
+                {isMobile ? <Icon size='sm' ml={-3}><GripVertical /> </Icon> : ''}
 
                 {/**CHECK BOX */}
 
@@ -149,14 +171,43 @@ const ListItem = ({ item, categories, optimisticDeleteCategoryIfEmpty }: ListIte
 
                 {/**ITEM TEXT */}
 
-                <Text
+                {/* <Text
                     flex={1}
                     textDecoration={item.checked ? 'line-through' : 'none'}
                     color={item.checked ? 'gray.500' : 'inherit'}
                     wordBreak='break-word'
                 >
-                    {item.name}
-                </Text>
+                    {item.name}{item.name.length < 2 ? '   ' : ''}
+                </Text> */}
+                <Editable.Root
+                    value={editable}
+                    onValueChange={(e) => {
+                        setEditable(e.value)
+                    }}
+                    flex={1}
+                    activationMode='none'
+                >
+                    <Editable.Preview
+                        fontSize='inherit'
+                        textDecoration={item.checked ? 'line-through' : 'none'}
+                        color={item.checked ? 'gray.500' : 'inherit'}
+                        wordBreak='break-word'
+                        minWidth="60px" // Ensures minimum clickable area
+                        onTouchStart={handleTouchStart}
+                        onTouchEnd={handleTouchEnd}
+                        onDoubleClick={() => editTriggerRef.current?.click()}
+                    />
+                    <Editable.Input
+                        // ref={inputRef}
+                        fontSize='inherit'
+                        textDecoration={item.checked ? 'line-through' : 'none'}
+                        color={item.checked ? 'gray.500' : 'inherit'}
+                        wordBreak='break-word'
+                    />
+                    <Editable.Control>
+                        <Editable.EditTrigger ref={editTriggerRef} hidden />
+                    </Editable.Control>
+                </Editable.Root>
 
                 {/** CATEGORY MENU */}
 

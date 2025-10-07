@@ -1,5 +1,5 @@
 //MainPanel/AddItemBar.tsx
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Box, HStack, IconButton } from '@chakra-ui/react';
 import { Editable } from '@chakra-ui/react'
 import { Category } from '.'
@@ -13,13 +13,13 @@ interface AddItemBarProps {
     listId?: string;
 }
 
-
 function AddItemBar({ containerRef, listId }: AddItemBarProps) {
 
     const addItem = useAddItem()
     const [itemName, setItemName] = useState('');
     // const [currentCategory, setCurrentCategory] = useState(null)
     // const [isLastMinute, setIsLastMinute] = useState(false)
+    const inputRef = useRef<HTMLInputElement>(null)
 
 
     async function handleAddItem(value: string) {
@@ -38,8 +38,14 @@ function AddItemBar({ containerRef, listId }: AddItemBarProps) {
         }
     }
 
-    const handleOnFocus = () => {
-
+    async function handleSubmitClick(e: React.MouseEvent) {
+        e.preventDefault()
+        e.stopPropagation()
+        handleAddItem(itemName)
+        //focus the input again
+        setTimeout(() => {
+            inputRef.current?.focus()
+        }, 0)
 
     }
 
@@ -62,14 +68,20 @@ function AddItemBar({ containerRef, listId }: AddItemBarProps) {
                 borderColor='gray.200'
             >
                 <HStack gap={3}>
-                    <Editable.Root fontSize='inherit' submitMode='none' value={itemName} onValueChange={(e) => setItemName(e.value)} placeholder="Add a new item to the list" onKeyDown={(e) => handleHitEnter(e)}
-                        onInteractOutside={(e) => e.preventDefault()} onFocus={handleOnFocus}
+                    <Editable.Root
+                        fontSize='inherit'
+                        submitMode='none'
+                        value={itemName}
+                        onValueChange={(e) => setItemName(e.value)}
+                        placeholder="Add a new item to the list"
+                        onKeyDown={(e) => handleHitEnter(e)}
+                    // onInteractOutside={(e) => console.log(itemName)}
                     >
                         <Editable.Preview fontSize='inherit' width="full" />
-                        <Editable.Input fontSize='inherit' />
+                        <Editable.Input ref={inputRef} fontSize='inherit' onBlur={(e) => setItemName(e.target.value)} />
                         <Editable.Control>
                             <Editable.SubmitTrigger asChild>
-                                <IconButton variant="outline" size="xs" onClick={(e) => e.stopPropagation()}>
+                                <IconButton variant="outline" size="xs" onClick={handleSubmitClick}>
                                     <Check />
                                 </IconButton>
                             </Editable.SubmitTrigger>

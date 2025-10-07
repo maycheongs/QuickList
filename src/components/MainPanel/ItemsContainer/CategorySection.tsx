@@ -72,17 +72,17 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
 
 
     const onCategoryChange = async (name: string) => {
-
+        name = name.trim()
         //if invalid or name is unchanged return
         if (!listId || !categoryName || !categoryId || name === categoryName) return
-        name = name.trim()
+
         //if empty revert to original name
         if (!name) {
             setEditable(categoryName)
             return
         }
         //If it is a duplicate add a counter to it
-        const existingCategoryNames = categories.map(c => c.name.toUpperCase())
+        const existingCategoryNames = categories.filter(c => c.id !== categoryId).map(c => c.name.toUpperCase())
         const baseName = name
         let counter = 1
         while (existingCategoryNames.includes(name.toUpperCase())) {
@@ -132,7 +132,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                     <Editable.Root
                                         value={editable}
                                         onValueChange={(e) => setEditable(e.value)}
-                                        activationMode={isMobile ? "none" : "dblclick"}
+                                        activationMode={isTouchScreen() ? "none" : "dblclick"}
                                         onValueCommit={(e) => onCategoryChange(e.value)}
                                         disabled={categoryId!.startsWith('temp')}
                                         fontSize='inherit'
@@ -169,8 +169,8 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                             textOverflow="ellipsis"
                                             overflow="hidden"
                                             fontSize='inherit'
-                                            onTouchStart={isTouchScreen() ? handleTouchStart : undefined}
-                                            onTouchEnd={isTouchScreen() ? handleTouchEnd : undefined}
+                                            onTouchStart={handleTouchStart}
+                                            onTouchEnd={handleTouchEnd}
                                         >
                                             {editable.toUpperCase()}
 
@@ -190,7 +190,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                                 borderBottomColor: 'blue.500',
                                             }}
                                         />
-                                        {isMobile && !isTouchScreen() ? <Editable.Control>
+                                        {/* {isMobile && !isTouchScreen() ? <Editable.Control>
                                             <Editable.EditTrigger asChild onClick={(e) => e.stopPropagation()}>
                                                 <IconButton variant="ghost" size="xs">
                                                     <PencilLine />
@@ -201,7 +201,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                                     <Check />
                                                 </IconButton>
                                             </Editable.SubmitTrigger>
-                                        </Editable.Control> : ''}
+                                        </Editable.Control> : ''} */}
                                     </Editable.Root> :
 
                                     <Box
@@ -235,6 +235,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
                                 item={item}
                                 categories={categories}
                                 optimisticDeleteCategoryIfEmpty={optimisticDeleteCategoryIfEmpty}
+                            // isTouchScreen={isTouchScreen()}
                             />
                         ))}
                     </VStack>
