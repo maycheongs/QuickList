@@ -1,0 +1,27 @@
+name: Daily DB Reset
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # every day at midnight UTC
+  workflow_dispatch: # allows manual trigger too
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Reset database
+        run: npx prisma migrate reset --force
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
