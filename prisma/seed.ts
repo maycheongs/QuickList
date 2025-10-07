@@ -49,7 +49,7 @@ async function main() {
             { name: "Apples", listId: groceryList.id, categoryId: fruitsCategory.id },
             { name: "Berries", listId: groceryList.id, categoryId: fruitsCategory.id },
             { name: "Peaches", listId: groceryList.id, categoryId: fruitsCategory.id },
-            { name: "Bananas (last minute)", listId: groceryList.id, lastMinute: true },
+            { name: "Bananas", listId: groceryList.id, lastMinute: true },
             { name: "Bread", listId: groceryList.id }, // no category
         ],
     });
