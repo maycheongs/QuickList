@@ -22,9 +22,9 @@ async function main() {
     });
     await prisma.item.createMany({
         data: [
-            { name: "Toothbrush", listId: list.id, isTask: false },
+            { name: "Toothbrush", listId: list.id, isTask: false, lastMinute: true },
             { name: "Passport", listId: list.id, isTask: false },
-            { name: "Sunglasses (last minute)", listId: list.id, isTask: false, lastMinute: true },
+            { name: "Sunglasses", listId: list.id, isTask: false },
         ],
     });
 
