@@ -4,6 +4,7 @@ A  **list manager** built with a **Next.js + GraphQL + Prisma**.
 Designed for simplicity, speed, type safety, and scalability
 ## 📸 See it Live
 - Deployed on https://quickquacklist.netlify.app/
+- DB resets daily via Github actions
 
 Desktop Screenshot
 

@@ -22,9 +22,9 @@ async function main() {
     });
     await prisma.item.createMany({
         data: [
-            { name: "Toothbrush", listId: list.id, isTask: false },
+            { name: "Toothbrush", listId: list.id, isTask: false, lastMinute: true },
             { name: "Passport", listId: list.id, isTask: false },
-            { name: "Sunglasses (last minute)", listId: list.id, isTask: false, lastMinute: true },
+            { name: "Sunglasses", listId: list.id, isTask: false },
         ],
     });
 
@@ -49,7 +49,7 @@ async function main() {
             { name: "Apples", listId: groceryList.id, categoryId: fruitsCategory.id },
             { name: "Berries", listId: groceryList.id, categoryId: fruitsCategory.id },
             { name: "Peaches", listId: groceryList.id, categoryId: fruitsCategory.id },
-            { name: "Bananas (last minute)", listId: groceryList.id, lastMinute: true },
+            { name: "Bananas", listId: groceryList.id, lastMinute: true },
             { name: "Bread", listId: groceryList.id }, // no category
         ],
     });
