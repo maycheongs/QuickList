@@ -215,7 +215,7 @@ function CategorySection({ categoryId, listId, items, isChecked, isLastMinute, c
 
                                 }
                                 <Spacer />
-                                <Badge size='sm' fontWeight='500' fontSize={11} color='inherit'>
+                                <Badge size='sm' fontWeight='500' fontSize={11} colorPalette={'gray'}>
                                     {`${items.length} items`}
                                 </Badge>
 
